@@ -1,7 +1,7 @@
 react-input-field
 =================
 
-React Input Field
+React Input Field with support for clear tool.
 
 ## Example
 
@@ -42,7 +42,6 @@ Unlike normal `<input>` fields (React.DOM.input), `react-input-field` calls the 
 
  * onChange(value: String) - a function to call when the input value should be updated
  * placeholder: String - a placeholder for the input
- * clearTool: Boolean - defaults to true. Whether to show a clear tool or not
- * label: String - a (optional) label for the field
- * labelPosition: 'String' - defaults to 'left'. Valid values: 'left', 'right'
- * inputHeight: Number/String - the height of the input field
+ * clearTool: Boolean - defaults to true. Whether to show a clear tool or not when field value is not empty
+ * validate: Function - if given, it will be called with the value of the field. If it returns false, the field will have a css class that marks it as invalid (defaults to props.invalidClassName='z-invalid')
+  * clearToolStyle: Object - a style for the clear tool

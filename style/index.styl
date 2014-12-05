@@ -1,66 +1,22 @@
 @import '~css-utils/index.styl'
-@import './constants.styl'
 
 .z-field
 .z-field *
     box-sizing border-box
 
 .z-field
-    align-items center
+    align-items stretch
     display inline-flex
-    align-items center
     @extend .u-flex-row
 
     .z-clear-tool
-        color $z-field-input-border-color
-        font-size 20px
-        margin-right 5px
-        margin-left 5px
-        cursor pointer
+        align-self center
         @extend .u-unselectable
 
-    .z-input-wrap
-        @extend .u-flex-row
-        align-items stretch
-        background white
-        border $z-field-input-border-width $z-field-input-border-style $z-field-input-border-color
-        position relative
-        // min-width $z-field-input-min-width
-        flex 1
-
-    &.z-focused
-        .z-input-wrap
-            border-color $z-field-input-focused-border-color
-
-    &.z-invalid
-        .z-input-wrap
-            border $z-field-input-invalid-border-width $z-field-input-invalid-border-style $z-field-input-invalid-border-color
-
-
     input
-        position relative
         flex 1
         border 0
-        line-height $z-field-input-line-height
-        padding $z-field-input-padding
-
-        if $z-field-input-outline
-            outline $z-field-input-outline
+        outline none
 
         &::-ms-clear
             display none
-
-    & > .z-label-icon
-        display inline-block
-        vertical-align middle
-
-    &.z-icon-position-top
-    &.z-icon-position-bottom
-
-        & > .z-label-icon
-        & > .z-label-text
-            display block
-
-
-    .z-actiontool
-        position relative

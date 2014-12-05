@@ -10,7 +10,6 @@ var VALUE = 'xxx'
 var App = React.createClass({
 
     onChange: function(value){
-        console.log('value!', value)
         VALUE = value
         this.setState({})
     },
@@ -29,7 +28,7 @@ var App = React.createClass({
 
         return (
             <div className="App" style={{padding: 10}}>
-                <Field label='First Name' clearTool={false} validate={validate} style={style} value={VALUE} onChange={this.onChange}/>
+                <Field clearTool={true} validate={validate} style={style} value={VALUE} onChange={this.onChange}/>
             </div>
         )
     }

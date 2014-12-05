@@ -1,11 +1,14 @@
 'use strict';
 
-require('custom-event-polyfill')
-
 var assign = require('object-assign')
 var React  = require('react')
 
 function emptyFn() {}
+
+var TOOL_STYLES = {
+    true : {display: 'inline-block'},
+    false: {display: 'none'}
+}
 
 var DESCRIPTOR = {
 
@@ -18,35 +21,33 @@ var DESCRIPTOR = {
 
     getDefaultProps: function () {
         return {
+            defaultClearToolStyle: {
+                fontSize   : 20,
+                marginRight: 5,
+                marginLeft : 5,
+                color      : '#a8a8a8',
+                alignSelf  : 'center',
+                cursor     : 'pointer',
+                userSelect : 'none'
+            },
             defaultStyle: {
+                flex      : 1,
+                display   : 'inline-flex',
+                flexFlow  : 'row',
+                alignItems: 'stretch',
+                border    : '1px solid #a8a8a8',
+                height: 30
             },
 
             defaultInputStyle: {
-                flex  : 1,
-                border: 0
-            },
-
-            defaultLabelStyle: {
-                padding: 5
-            },
-
-            defaultWrapperStyle: {
-                flex      : 1,
-                display   : 'flex',
-                flexFlow  : 'row',
-                alignItems: 'center',
-                border    : '1px solid #a8a8a8'
-            },
-
-            labelPosition: 'left',
-
-            defaultInputProps: {
+                flex   : 1,
+                border : 0,
                 padding: '6px 2px',
+                outline: 'none'
             },
 
-            inputHeight: 30,
             inputClassName: '',
-            inputProps: null,
+            inputProps    : null,
 
             clearTool: true,
 
@@ -62,39 +63,20 @@ var DESCRIPTOR = {
 
         return (
             <div {...props}>
-                {this.renderChildren(props)}
+                {this.renderField(props)}
+                {this.renderClearTool(props)}
             </div>
         )
-    },
-
-    renderChildren: function(props) {
-
-        var children = []
-        var label    = this.renderLabel(props)
-        var field    = this.renderField(props)
-
-        if (props.labelPosition === 'left'){
-            children.push(label, field)
-        } else {
-            children.push(field, label)
-        }
-
-        return children
     },
 
     renderField: function(props) {
         var inputProps = this.prepareInputProps(props)
 
-        if (props.fieldFactory){
-            return props.fieldFactory(inputProps, props)
+        if (props.inputFactory){
+            return props.inputFactory(inputProps, props)
         }
 
-        return (
-            <div {...this.prepareWrapperProps(props)}>
-                <input ref="input" {...inputProps} />
-                {this.renderClearTool(props)}
-            </div>
-        )
+        return <input ref="input" {...inputProps} />
     },
 
     renderClearTool: function(props) {
@@ -103,31 +85,16 @@ var DESCRIPTOR = {
             return
         }
 
-        var clearVisible = !this.isEmpty(props)
+        var visible = !this.isEmpty(props)
+        var style   = assign(this.prepareClearToolStyle(props), TOOL_STYLES[visible])
 
         return <div
-            onClick={this.handleClearToolClick}
             className='z-clear-tool'
-            style={{display: clearVisible? 'inline-block': 'none'}}
+            onClick={this.handleClearToolClick}
+            style={style}
         >✖</div>
     },
 
-    renderLabel: function(props) {
-        if (this.hasLabel(props)){
-
-            var labelProps = this.prepareLabelProps(props)
-
-            if (props.labelFactory){
-                return props.labelFactory(labelProps, props)
-            }
-
-            return <label {...labelProps} />
-        }
-    },
-
-    hasLabel: function(props) {
-        return !!props.label || props.labelFactory
-    },
 
     isEmpty: function(props) {
         return !(props.value + '')
@@ -144,8 +111,18 @@ var DESCRIPTOR = {
         return result
     },
 
+    getInput: function() {
+        return this.refs.input.getDOMNode()
+    },
+
     handleClearToolClick: function(event) {
-        this.notify('')
+        this.notify('', event)
+
+        var input = this.getInput()
+
+        if (input && typeof input.focus === 'function'){
+            input.focus()
+        }
     },
 
     handleChange: function(event) {
@@ -190,67 +167,30 @@ var DESCRIPTOR = {
         return assign({}, props.defaultStyle, props.style)
     },
 
-    prepareLabelProps: function(props) {
-
-        var labelProps = {
-            className: props.labelClassName
-        }
-
-        assign(labelProps, props.defaultLabelProps, props.labelProps)
-
-        labelProps.style = this.prepareLabelStyle(props)
-        labelProps.children = props.label
-        labelProps.key = 'label'
-
-        return labelProps
-    },
-
     prepareInputProps: function(props) {
 
         var inputProps = {
-            className  : props.inputClassName,
-            placeholder: props.placeholder
+            className: props.inputClassName
         }
 
         assign(inputProps, props.defaultInputProps, props.inputProps)
 
-        inputProps.style    = this.prepareInputStyle(props)
-        inputProps.key      = 'field'
-        inputProps.value    = props.value
-        inputProps.onChange = this.handleChange
+        inputProps.key         = 'field'
+        inputProps.value       = props.value
+        inputProps.placeholder = props.placeholder
+        inputProps.onChange    = this.handleChange
+        inputProps.style       = this.prepareInputStyle(props)
 
         return inputProps
     },
 
-    prepareLabelStyle: function(props) {
-        return assign({}, props.defaultLabelStyle, props.labelStyle)
-    },
 
     prepareInputStyle: function(props) {
-        return assign({
-            height: props.inputHeight
-        }, props.defaultInputStyle, props.inputStyle)
+        return assign({}, props.defaultInputStyle, props.inputStyle)
     },
 
-    prepareWrapperProps: function(props) {
-        var wrapperProps = {}
-
-        assign(wrapperProps, {
-            className: 'z-input-wrap'
-        })
-
-        wrapperProps.style = this.prepareWrapperStyle(props)
-        wrapperProps.key   = 'wrapper'
-
-        return wrapperProps
-    },
-
-    prepareWrapperStyle: function(props) {
-        var style = {}
-
-        assign(style, props.defaultWrapperStyle, props.wrapperStyle)
-
-        return style
+    prepareClearToolStyle: function(props) {
+        return assign({}, props.defaultClearToolStyle, props.clearToolStyle)
     }
 }
 
