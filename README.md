@@ -45,3 +45,7 @@ Unlike normal `<input>` fields (React.DOM.input), `react-input-field` calls the 
  * clearTool: Boolean - defaults to true. Whether to show a clear tool or not when field value is not empty
  * validate: Function - if given, it will be called with the value of the field. If it returns false, the field will have a css class that marks it as invalid (defaults to props.invalidClassName='z-invalid')
   * clearToolStyle: Object - a style for the clear tool
+  * emptyValue: String/Function
+  * isEmpty: Function
+  * toolsPosition: String - defaults to 'right'. Can also be 'left'
+  * invalidStyle: Object  - style to be applied when the field is invalid

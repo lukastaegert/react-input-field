@@ -28,7 +28,7 @@ var App = React.createClass({
 
         return (
             <div className="App" style={{padding: 10}}>
-                <Field clearTool={true} validate={validate} style={style} value={VALUE} onChange={this.onChange}/>
+                <Field placeholder="test" clearTool={true} validate={validate} style={style} value={VALUE} onChange={this.onChange}/>
             </div>
         )
     }

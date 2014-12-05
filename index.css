@@ -664,6 +664,9 @@ html.u-app body * {
   align-items: stretch;
   display: inline-flex;
 }
+.z-field.z-invalid {
+  border-color: #f00;
+}
 .z-field .z-clear-tool {
   align-self: center;
 }

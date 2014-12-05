@@ -16,6 +16,7 @@ var DESCRIPTOR = {
 
     propTypes: {
         validate : React.PropTypes.func,
+        isEmpty  : React.PropTypes.func,
         clearTool: React.PropTypes.bool
     },
 
@@ -28,24 +29,36 @@ var DESCRIPTOR = {
                 color      : '#a8a8a8',
                 alignSelf  : 'center',
                 cursor     : 'pointer',
-                userSelect : 'none'
+                userSelect : 'none',
+                boxSizing: 'border-box'
             },
             defaultStyle: {
-                flex      : 1,
                 display   : 'inline-flex',
                 flexFlow  : 'row',
                 alignItems: 'stretch',
                 border    : '1px solid #a8a8a8',
-                height: 30
+                boxSizing : 'border-box',
+                height    : 30
+            },
+
+            defaultInvalidStyle: {
+                border : '1px solid rgb(248, 144, 144)'
             },
 
             defaultInputStyle: {
                 flex   : 1,
                 border : 0,
+                height : '100%',
                 padding: '6px 2px',
-                outline: 'none'
+                outline: 'none',
+                boxSizing: 'border-box'
             },
 
+            defaultInputInvalidStyle: {
+
+            },
+
+            emptyValue: '',
             inputClassName: '',
             inputProps    : null,
 
@@ -53,7 +66,9 @@ var DESCRIPTOR = {
 
             defaultClassName: 'z-field',
             emptyClassName  : 'z-empty-value',
-            invalidClassName: 'z-invalid'
+            invalidClassName: 'z-invalid',
+
+            toolsPosition: 'right'
         }
     },
 
@@ -61,7 +76,17 @@ var DESCRIPTOR = {
 
         var props = this.prepareProps(this.props)
 
-        props.children = [this.renderField(props)].concat(this.renderTools(props))
+        var field = this.renderField(props)
+        var tools = this.renderTools(props)
+        var children = [field]
+
+        if (props.toolsPosition == 'after' || props.toolsPosition == 'right'){
+            children.push.apply(children, tools)
+        } else {
+            children = (tools || []).concat(field)
+        }
+
+        props.children = children
 
         return <div {...props} />
     },
@@ -104,9 +129,24 @@ var DESCRIPTOR = {
         >✖</div>
     },
 
-
     isEmpty: function(props) {
-        return !(props.value + '')
+        var emptyValue = this.getEmptyValue(props)
+
+        if (typeof props.isEmpty === 'function'){
+            return props.isEmpty(props, emptyValue)
+        }
+
+        return props.value + '' === emptyValue + ''
+    },
+
+    getEmptyValue: function(props){
+        var value = props.emptyValue
+
+        if (typeof value === 'function'){
+            value = value(props)
+        }
+
+        return value
     },
 
     isValid: function(props) {
@@ -125,7 +165,7 @@ var DESCRIPTOR = {
     },
 
     handleClearToolClick: function(event) {
-        this.notify('', event)
+        this.notify(this.getEmptyValue(this.props), event)
 
         var input = this.getInput()
 
@@ -152,6 +192,8 @@ var DESCRIPTOR = {
 
         assign(props, thisProps)
 
+        props.valid = this.isValid(props)
+
         props.className = this.prepareClassName(props)
         props.style = this.prepareStyle(props)
 
@@ -165,7 +207,7 @@ var DESCRIPTOR = {
             result.push(props.emptyClassName)
         }
 
-        if (!this.isValid(props)){
+        if (!props.valid){
             result.push(props.invalidClassName)
         }
 
@@ -173,7 +215,13 @@ var DESCRIPTOR = {
     },
 
     prepareStyle: function(props) {
-        return assign({}, props.defaultStyle, props.style)
+        var style = assign({}, props.defaultStyle, props.style)
+
+        if (!props.valid){
+            assign(style, props.defaultInvalidStyle, props.invalidStyle)
+        }
+
+        return style
     },
 
     prepareInputProps: function(props) {
@@ -189,13 +237,32 @@ var DESCRIPTOR = {
         inputProps.placeholder = props.placeholder
         inputProps.onChange    = this.handleChange
         inputProps.style       = this.prepareInputStyle(props)
+        inputProps.onFocus     = this.handleFocus
+        inputProps.onBlur      = this.handleBlur
 
         return inputProps
     },
 
+    handleFocus: function(){
+        this._focused = true
+    },
+
+    handleBlur: function(){
+        this._focused = false
+    },
+
+    isFocused: function(){
+        return !!this._focused
+    },
 
     prepareInputStyle: function(props) {
-        return assign({}, props.defaultInputStyle, props.inputStyle)
+        var style = assign({}, props.defaultInputStyle, props.inputStyle)
+
+        if (!props.valid){
+            assign(style, props.defaultInputInvalidStyle, props.defaultInputInvalidStyle)
+        }
+
+        return style
     },
 
     prepareClearToolStyle: function(props) {

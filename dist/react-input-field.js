@@ -72,6 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    propTypes: {
 	        validate : React.PropTypes.func,
+	        isEmpty  : React.PropTypes.func,
 	        clearTool: React.PropTypes.bool
 	    },
 
@@ -87,12 +88,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                userSelect : 'none'
 	            },
 	            defaultStyle: {
-	                flex      : 1,
 	                display   : 'inline-flex',
 	                flexFlow  : 'row',
 	                alignItems: 'stretch',
 	                border    : '1px solid #a8a8a8',
-	                height: 30
+	                boxSizing : 'border-box',
+	                height    : 30
 	            },
 
 	            defaultInputStyle: {
@@ -102,6 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                outline: 'none'
 	            },
 
+	            emptyValue: '',
 	            inputClassName: '',
 	            inputProps    : null,
 
@@ -160,9 +162,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, "✖")
 	    },
 
-
 	    isEmpty: function(props) {
-	        return !(props.value + '')
+	        var emptyValue = this.getEmptyValue(props)
+
+	        if (typeof props.isEmpty === 'function'){
+	            return props.isEmpty(props, emptyValue)
+	        }
+
+	        return props.value + '' === emptyValue + ''
+	    },
+
+	    getEmptyValue: function(props){
+	        var value = props.emptyValue
+
+	        if (typeof value === 'function'){
+	            value = value(props)
+	        }
+
+	        return value
 	    },
 
 	    isValid: function(props) {
@@ -181,7 +198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 
 	    handleClearToolClick: function(event) {
-	        this.notify('', event)
+	        this.notify(this.getEmptyValue(this.props), event)
 
 	        var input = this.getInput()
 
@@ -245,10 +262,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        inputProps.placeholder = props.placeholder
 	        inputProps.onChange    = this.handleChange
 	        inputProps.style       = this.prepareInputStyle(props)
+	        inputProps.onFocus     = this.handleFocus
+	        inputProps.onBlur      = this.handleBlur
 
 	        return inputProps
 	    },
 
+	    handleFocus: function(){
+	        this._focused = true
+	    },
+
+	    handleBlur: function(){
+	        this._focused = false
+	    },
+
+	    isFocused: function(){
+	        return !!this._focused
+	    },
 
 	    prepareInputStyle: function(props) {
 	        return assign({}, props.defaultInputStyle, props.inputStyle)
