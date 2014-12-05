@@ -117,12 +117,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var props = this.prepareProps(this.props)
 
-	        return (
-	            React.createElement("div", React.__spread({},  props), 
-	                this.renderField(props), 
-	                this.renderClearTool(props)
-	            )
-	        )
+	        props.children = [this.renderField(props)].concat(this.renderTools(props))
+
+	        return React.createElement("div", React.__spread({},  props))
 	    },
 
 	    renderField: function(props) {
@@ -133,6 +130,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        return React.createElement("input", React.__spread({ref: "input"},  inputProps))
+	    },
+
+	    renderTools: function(props) {
+
+	        var clearTool = this.renderClearTool(props)
+	        var result    = [clearTool]
+
+	        if (typeof props.tools === 'function'){
+	            result = props.tools(props, clearTool)
+	        }
+
+	        return result
 	    },
 
 	    renderClearTool: function(props) {

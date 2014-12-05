@@ -61,12 +61,9 @@ var DESCRIPTOR = {
 
         var props = this.prepareProps(this.props)
 
-        return (
-            <div {...props}>
-                {this.renderField(props)}
-                {this.renderClearTool(props)}
-            </div>
-        )
+        props.children = [this.renderField(props)].concat(this.renderTools(props))
+
+        return <div {...props} />
     },
 
     renderField: function(props) {
@@ -77,6 +74,18 @@ var DESCRIPTOR = {
         }
 
         return <input ref="input" {...inputProps} />
+    },
+
+    renderTools: function(props) {
+
+        var clearTool = this.renderClearTool(props)
+        var result    = [clearTool]
+
+        if (typeof props.tools === 'function'){
+            result = props.tools(props, clearTool)
+        }
+
+        return result
     },
 
     renderClearTool: function(props) {
