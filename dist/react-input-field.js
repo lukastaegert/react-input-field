@@ -63,7 +63,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var TOOL_STYLES = {
 	    true : {display: 'inline-block'},
-	    false: {display: 'none'}
+	    false: {visibility: 'hidden'}
 	}
 
 	var DESCRIPTOR = {
@@ -85,7 +85,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                color      : '#a8a8a8',
 	                alignSelf  : 'center',
 	                cursor     : 'pointer',
-	                userSelect : 'none'
+	                userSelect : 'none',
+	                boxSizing: 'border-box'
 	            },
 	            defaultStyle: {
 	                display   : 'inline-flex',
@@ -96,11 +97,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                height    : 30
 	            },
 
+	            defaultInvalidStyle: {
+	                border : '1px solid rgb(248, 144, 144)'
+	            },
+
 	            defaultInputStyle: {
 	                flex   : 1,
 	                border : 0,
+	                height : '100%',
 	                padding: '6px 2px',
-	                outline: 'none'
+	                outline: 'none',
+	                boxSizing: 'border-box'
+	            },
+
+	            defaultInputInvalidStyle: {
+
 	            },
 
 	            emptyValue: '',
@@ -111,27 +122,58 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            defaultClassName: 'z-field',
 	            emptyClassName  : 'z-empty-value',
-	            invalidClassName: 'z-invalid'
+	            invalidClassName: 'z-invalid',
+
+	            toolsPosition: 'right'
 	        }
 	    },
 
 	    render: function() {
 
+	        if (this.valid === undefined){
+	            this.valid = true
+	        }
+
 	        var props = this.prepareProps(this.props)
 
-	        props.children = [this.renderField(props)].concat(this.renderTools(props))
+	        if (this.valid !== props.valid && typeof props.onValidityChange === 'function'){
+	            setTimeout(function(){
+	                props.onValidityChange(props.valid, props.value, props)
+	            }, 0)
+	        }
+
+	        this.valid = props.valid
+
+	        props.children = this.renderChildren(props)
 
 	        return React.createElement("div", React.__spread({},  props))
+	    },
+
+	    renderChildren: function(props){
+	        var field = this.renderField(props)
+	        var tools = this.renderTools(props)
+
+	        var children = [field]
+
+	        if (props.toolsPosition == 'after' || props.toolsPosition == 'right'){
+	            children.push.apply(children, tools)
+	        } else {
+	            children = (tools || []).concat(field)
+	        }
+
+	        return children
 	    },
 
 	    renderField: function(props) {
 	        var inputProps = this.prepareInputProps(props)
 
+	        inputProps.ref = 'input'
+
 	        if (props.inputFactory){
 	            return props.inputFactory(inputProps, props)
 	        }
 
-	        return React.createElement("input", React.__spread({ref: "input"},  inputProps))
+	        return React.createElement("input", React.__spread({},  inputProps))
 	    },
 
 	    renderTools: function(props) {
@@ -197,14 +239,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.refs.input.getDOMNode()
 	    },
 
-	    handleClearToolClick: function(event) {
-	        this.notify(this.getEmptyValue(this.props), event)
-
+	    focus: function(){
 	        var input = this.getInput()
 
 	        if (input && typeof input.focus === 'function'){
 	            input.focus()
 	        }
+	    },
+
+	    handleClearToolClick: function(event) {
+	        this.notify(this.getEmptyValue(this.props), event)
+
+	        this.focus()
 	    },
 
 	    handleChange: function(event) {
@@ -225,6 +271,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        assign(props, thisProps)
 
+	        props.valid = this.isValid(props)
+
 	        props.className = this.prepareClassName(props)
 	        props.style = this.prepareStyle(props)
 
@@ -238,7 +286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            result.push(props.emptyClassName)
 	        }
 
-	        if (!this.isValid(props)){
+	        if (!props.valid){
 	            result.push(props.invalidClassName)
 	        }
 
@@ -246,7 +294,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 
 	    prepareStyle: function(props) {
-	        return assign({}, props.defaultStyle, props.style)
+	        var style = assign({}, props.defaultStyle, props.style)
+
+	        if (!props.valid){
+	            assign(style, props.defaultInvalidStyle, props.invalidStyle)
+	        }
+
+	        return style
 	    },
 
 	    prepareInputProps: function(props) {
@@ -264,6 +318,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        inputProps.style       = this.prepareInputStyle(props)
 	        inputProps.onFocus     = this.handleFocus
 	        inputProps.onBlur      = this.handleBlur
+	        inputProps.name = props.name
+	        inputProps.readOnly = props.readOnly
 
 	        return inputProps
 	    },
@@ -281,7 +337,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 
 	    prepareInputStyle: function(props) {
-	        return assign({}, props.defaultInputStyle, props.inputStyle)
+	        var style = assign({}, props.defaultInputStyle, props.inputStyle)
+
+	        if (!props.valid){
+	            assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)
+	        }
+
+	        return style
 	    },
 
 	    prepareClearToolStyle: function(props) {

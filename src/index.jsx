@@ -7,8 +7,10 @@ function emptyFn() {}
 
 var TOOL_STYLES = {
     true : {display: 'inline-block'},
-    false: {display: 'none'}
+    false: {visibility: 'hidden'}
 }
+
+var INDEX = 0
 
 var DESCRIPTOR = {
 
@@ -22,16 +24,20 @@ var DESCRIPTOR = {
 
     getDefaultProps: function () {
         return {
+            focusOnClick: true,
+
             defaultClearToolStyle: {
                 fontSize   : 20,
                 marginRight: 5,
                 marginLeft : 5,
-                color      : '#a8a8a8',
+
                 alignSelf  : 'center',
                 cursor     : 'pointer',
                 userSelect : 'none',
                 boxSizing: 'border-box'
             },
+            clearToolColor    : '#a8a8a8',
+            clearToolOverColor: '#7F7C7C',
             defaultStyle: {
                 display   : 'inline-flex',
                 flexFlow  : 'row',
@@ -74,10 +80,35 @@ var DESCRIPTOR = {
 
     render: function() {
 
+        if (this.valid === undefined){
+            this.valid = true
+        }
+
         var props = this.prepareProps(this.props)
 
-        var field = this.renderField(props)
-        var tools = this.renderTools(props)
+        if (this.valid !== props.valid && typeof props.onValidityChange === 'function'){
+            setTimeout(function(){
+                props.onValidityChange(props.valid, props.value, props)
+            }, 0)
+        }
+
+        this.valid = props.valid
+
+        props.children = this.renderChildren(props, this.state)
+
+        // delete props.value
+
+        var divProps = assign({}, props)
+        delete divProps.value
+        delete divProps.placeholder
+
+        return <div {...divProps} />
+    },
+
+    renderChildren: function(props, state){
+        var field = this.renderField(props, state)
+        var tools = this.renderTools(props, state)
+
         var children = [field]
 
         if (props.toolsPosition == 'after' || props.toolsPosition == 'right'){
@@ -86,24 +117,24 @@ var DESCRIPTOR = {
             children = (tools || []).concat(field)
         }
 
-        props.children = children
-
-        return <div {...props} />
+        return children
     },
 
     renderField: function(props) {
         var inputProps = this.prepareInputProps(props)
 
+        inputProps.ref = 'input'
+
         if (props.inputFactory){
             return props.inputFactory(inputProps, props)
         }
 
-        return <input ref="input" {...inputProps} />
+        return <input {...inputProps} />
     },
 
-    renderTools: function(props) {
+    renderTools: function(props, state) {
 
-        var clearTool = this.renderClearTool(props)
+        var clearTool = this.renderClearTool(props, state)
         var result    = [clearTool]
 
         if (typeof props.tools === 'function'){
@@ -113,20 +144,34 @@ var DESCRIPTOR = {
         return result
     },
 
-    renderClearTool: function(props) {
+    renderClearTool: function(props, state) {
 
         if (!props.clearTool){
             return
         }
 
         var visible = !this.isEmpty(props)
-        var style   = assign(this.prepareClearToolStyle(props), TOOL_STYLES[visible])
+        var style   = assign({}, TOOL_STYLES[visible], this.prepareClearToolStyle(props, state))
 
         return <div
             className='z-clear-tool'
             onClick={this.handleClearToolClick}
+            onMouseOver={this.handleClearToolOver}
+            onMouseOut={this.handleClearToolOut}
             style={style}
         >✖</div>
+    },
+
+    handleClearToolOver: function(){
+        this.setState({
+            clearToolOver: true
+        })
+    },
+
+    handleClearToolOut: function(){
+        this.setState({
+            clearToolOver: false
+        })
     },
 
     isEmpty: function(props) {
@@ -164,9 +209,7 @@ var DESCRIPTOR = {
         return this.refs.input.getDOMNode()
     },
 
-    handleClearToolClick: function(event) {
-        this.notify(this.getEmptyValue(this.props), event)
-
+    focus: function(){
         var input = this.getInput()
 
         if (input && typeof input.focus === 'function'){
@@ -174,13 +217,28 @@ var DESCRIPTOR = {
         }
     },
 
+    handleClick: function(event){
+        if (this.props.focusOnClick && !this.isFocused()){
+            this.focus()
+        }
+    },
+
+    handleClearToolClick: function(event) {
+        this.notify(this.getEmptyValue(this.props), event)
+    },
+
     handleChange: function(event) {
         event.stopPropagation()
         this.notify(event.target.value)
     },
 
+    handleSelect: function(event) {
+        event.stopPropagation()
+        ;(this.props.onSelect || emptyFn)(event)
+    },
+
     notify: function(value, event) {
-        ;(this.props.onChange || emptyFn)(value, this, event)
+        ;(this.props.onChange || emptyFn)(value, this.props, event)
     },
 
     //*****************//
@@ -193,6 +251,7 @@ var DESCRIPTOR = {
         assign(props, thisProps)
 
         props.valid = this.isValid(props)
+        props.onClick = this.handleClick
 
         props.className = this.prepareClassName(props)
         props.style = this.prepareStyle(props)
@@ -236,9 +295,12 @@ var DESCRIPTOR = {
         inputProps.value       = props.value
         inputProps.placeholder = props.placeholder
         inputProps.onChange    = this.handleChange
+        inputProps.onSelect    = this.handleSelect
         inputProps.style       = this.prepareInputStyle(props)
         inputProps.onFocus     = this.handleFocus
         inputProps.onBlur      = this.handleBlur
+        inputProps.name = props.name
+        inputProps.readOnly = props.readOnly
 
         return inputProps
     },
@@ -256,17 +318,50 @@ var DESCRIPTOR = {
     },
 
     prepareInputStyle: function(props) {
-        var style = assign({}, props.defaultInputStyle, props.inputStyle)
+        var inputStyle = props.inputProps?
+                            props.inputProps.style:
+                            null
+
+        var style = assign({}, props.defaultInputStyle, props.inputStyle, inputStyle)
 
         if (!props.valid){
-            assign(style, props.defaultInputInvalidStyle, props.defaultInputInvalidStyle)
+            assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)
         }
 
         return style
     },
 
-    prepareClearToolStyle: function(props) {
-        return assign({}, props.defaultClearToolStyle, props.clearToolStyle)
+    prepareClearToolStyle: function(props, state) {
+        var defaultClearToolOverStyle
+        var clearToolOverStyle
+        var clearToolColor
+
+        if (state && state.clearToolOver){
+            defaultClearToolOverStyle = props.defaultClearToolOverStyle
+            clearToolOverStyle = props.clearToolOverStyle
+        }
+
+        if (props.clearToolColor){
+            clearToolColor = {
+                color: props.clearToolColor
+            }
+            if (state && state.clearToolOver && props.clearToolOverColor){
+                clearToolColor = {
+                    color: props.clearToolOverColor
+                }
+            }
+        }
+
+        var style = assign(
+                        {},
+                        props.defaultClearToolStyle,
+                        defaultClearToolOverStyle,
+                        clearToolColor,
+                        props.clearToolStyle,
+                        clearToolOverStyle
+                    )
+
+        return style
     }
 }
 
