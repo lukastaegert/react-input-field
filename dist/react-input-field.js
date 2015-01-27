@@ -63,31 +63,46 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var TOOL_STYLES = {
 	    true : {display: 'inline-block'},
-	    false: {visibility: 'hidden'}
+	    false: {cursor: 'text', color: 'transparent'}
 	}
+
+	var INDEX = 0
 
 	var DESCRIPTOR = {
 
 	    displayName: 'ReactInputField',
 
 	    propTypes: {
-	        validate : React.PropTypes.func,
+	        validate : React.PropTypes.oneOfType([
+	            React.PropTypes.func,
+	            React.PropTypes.bool
+	        ]),
 	        isEmpty  : React.PropTypes.func,
 	        clearTool: React.PropTypes.bool
 	    },
 
+	    getInitialState: function(){
+	        return {
+	            defaultValue: this.props.defaultValue
+	        }
+	    },
+
 	    getDefaultProps: function () {
 	        return {
+	            focusOnClick: true,
+
 	            defaultClearToolStyle: {
 	                fontSize   : 20,
-	                marginRight: 5,
-	                marginLeft : 5,
-	                color      : '#a8a8a8',
+	                paddingRight: 5,
+	                paddingLeft : 5,
+
 	                alignSelf  : 'center',
 	                cursor     : 'pointer',
 	                userSelect : 'none',
 	                boxSizing: 'border-box'
 	            },
+	            clearToolColor    : '#a8a8a8',
+	            clearToolOverColor: '#7F7C7C',
 	            defaultStyle: {
 	                display   : 'inline-flex',
 	                flexFlow  : 'row',
@@ -134,7 +149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.valid = true
 	        }
 
-	        var props = this.prepareProps(this.props)
+	        var props = this.prepareProps(this.props, this.state)
 
 	        if (this.valid !== props.valid && typeof props.onValidityChange === 'function'){
 	            setTimeout(function(){
@@ -144,16 +159,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        this.valid = props.valid
 
-	        props.children = this.renderChildren(props)
+	        props.children = this.renderChildren(props, this.state)
 
-	        return React.createElement("div", React.__spread({},  props))
+	        // delete props.value
+
+	        var divProps = assign({}, props)
+	        delete divProps.value
+	        delete divProps.placeholder
+
+	        return React.createElement("div", React.__spread({},  divProps))
 	    },
 
-	    renderChildren: function(props){
-	        var field = this.renderField(props)
-	        var tools = this.renderTools(props)
+	    renderChildren: function(props, state){
+	        var field = this.renderField(props, state)
+	        var tools = this.renderTools(props, state)
 
-	        var children = [field]
+	        var children = [field, props.children]
 
 	        if (props.toolsPosition == 'after' || props.toolsPosition == 'right'){
 	            children.push.apply(children, tools)
@@ -176,9 +197,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return React.createElement("input", React.__spread({},  inputProps))
 	    },
 
-	    renderTools: function(props) {
+	    renderTools: function(props, state) {
 
-	        var clearTool = this.renderClearTool(props)
+	        var clearTool = this.renderClearTool(props, state)
 	        var result    = [clearTool]
 
 	        if (typeof props.tools === 'function'){
@@ -188,20 +209,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return result
 	    },
 
-	    renderClearTool: function(props) {
+	    renderClearTool: function(props, state) {
 
-	        if (!props.clearTool){
+	        if (!props.clearTool || props.readOnly){
 	            return
 	        }
 
-	        var visible = !this.isEmpty(props)
-	        var style   = assign(this.prepareClearToolStyle(props), TOOL_STYLES[visible])
+	        var visible         = !this.isEmpty(props)
+	        var visibilityStyle = TOOL_STYLES[visible]
+	        var style           = assign({}, visibilityStyle, this.prepareClearToolStyle(props, state))
+
+	        if (!visible){
+	            assign(style, visibilityStyle)
+	        }
 
 	        return React.createElement("div", {
 	            className: "z-clear-tool", 
 	            onClick: this.handleClearToolClick, 
+	            onMouseDown: this.handleClearToolMouseDown, 
+	            onMouseOver: this.handleClearToolOver, 
+	            onMouseOut: this.handleClearToolOut, 
 	            style: style
 	        }, "✖")
+	    },
+
+	    handleClearToolMouseDown: function(event) {
+	        event.preventDefault()
+	    },
+
+	    handleClearToolOver: function(){
+	        this.setState({
+	            clearToolOver: true
+	        })
+	    },
+
+	    handleClearToolOut: function(){
+	        this.setState({
+	            clearToolOver: false
+	        })
 	    },
 
 	    isEmpty: function(props) {
@@ -247,36 +292,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 
+	    handleClick: function(event){
+	        if (this.props.focusOnClick && !this.isFocused()){
+	            this.focus()
+	        }
+	    },
+
+	    handleMouseDown: function(event) {
+	        ;(this.props.onMouseDown || emptyFn)(event)
+	        // event.preventDefault()
+	    },
+
 	    handleClearToolClick: function(event) {
 	        this.notify(this.getEmptyValue(this.props), event)
-
-	        this.focus()
 	    },
 
 	    handleChange: function(event) {
 	        event.stopPropagation()
-	        this.notify(event.target.value)
+	        this.notify(event.target.value, event)
+	    },
+
+	    handleSelect: function(event) {
+	        event.stopPropagation()
+	        ;(this.props.onSelect || emptyFn)(event)
 	    },
 
 	    notify: function(value, event) {
-	        ;(this.props.onChange || emptyFn)(value, this, event)
+	        if (this.props.value === undefined){
+	            this.setState({
+	                defaultValue: value
+	            })
+	        }
+	        ;(this.props.onChange || emptyFn)(value, this.props, event)
 	    },
 
 	    //*****************//
 	    // PREPARE METHODS //
 	    //*****************//
-	    prepareProps: function(thisProps) {
+	    prepareProps: function(thisProps, state) {
 
 	        var props = {}
 
 	        assign(props, thisProps)
 
+	        props.value = this.prepareValue(props, state)
 	        props.valid = this.isValid(props)
+	        props.onClick = this.handleClick
+	        props.onMouseDown = this.handleMouseDown
 
 	        props.className = this.prepareClassName(props)
 	        props.style = this.prepareStyle(props)
 
 	        return props
+	    },
+
+	    prepareValue: function(props, state) {
+
+	        var value = props.value === undefined?
+	                        state.defaultValue:
+	                        props.value
+
+	        return value
 	    },
 
 	    prepareClassName: function(props) {
@@ -315,11 +391,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        inputProps.value       = props.value
 	        inputProps.placeholder = props.placeholder
 	        inputProps.onChange    = this.handleChange
+	        inputProps.onSelect    = this.handleSelect
 	        inputProps.style       = this.prepareInputStyle(props)
 	        inputProps.onFocus     = this.handleFocus
 	        inputProps.onBlur      = this.handleBlur
-	        inputProps.name = props.name
-	        inputProps.readOnly = props.readOnly
+	        inputProps.name        = props.name
+	        inputProps.disabled    = props.disabled
+	        inputProps.readOnly    = props.readOnly
 
 	        return inputProps
 	    },
@@ -337,7 +415,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 
 	    prepareInputStyle: function(props) {
-	        var style = assign({}, props.defaultInputStyle, props.inputStyle)
+	        var inputStyle = props.inputProps?
+	                            props.inputProps.style:
+	                            null
+
+	        var style = assign({}, props.defaultInputStyle, props.inputStyle, inputStyle)
 
 	        if (!props.valid){
 	            assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)
@@ -346,8 +428,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return style
 	    },
 
-	    prepareClearToolStyle: function(props) {
-	        return assign({}, props.defaultClearToolStyle, props.clearToolStyle)
+	    prepareClearToolStyle: function(props, state) {
+	        var defaultClearToolOverStyle
+	        var clearToolOverStyle
+	        var clearToolColor
+
+	        if (state && state.clearToolOver){
+	            defaultClearToolOverStyle = props.defaultClearToolOverStyle
+	            clearToolOverStyle = props.clearToolOverStyle
+	        }
+
+	        if (props.clearToolColor){
+	            clearToolColor = {
+	                color: props.clearToolColor
+	            }
+	            if (state && state.clearToolOver && props.clearToolOverColor){
+	                clearToolColor = {
+	                    color: props.clearToolOverColor
+	                }
+	            }
+	        }
+
+	        var style = assign(
+	                        {},
+	                        props.defaultClearToolStyle,
+	                        defaultClearToolOverStyle,
+	                        clearToolColor,
+	                        props.clearToolStyle,
+	                        clearToolOverStyle
+	                    )
+
+	        return style
 	    }
 	}
 
