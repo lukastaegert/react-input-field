@@ -211,7 +211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    renderClearTool: function(props, state) {
 
-	        if (!props.clearTool || props.readOnly){
+	        if (!props.clearTool || props.readOnly || props.disabled){
 	            return
 	        }
 
