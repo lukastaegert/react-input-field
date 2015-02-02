@@ -58,6 +58,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var assign = __webpack_require__(2)
 	var React  = __webpack_require__(1)
+	var prefixer = __webpack_require__(3)
+
 
 	function emptyFn() {}
 
@@ -104,12 +106,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            clearToolColor    : '#a8a8a8',
 	            clearToolOverColor: '#7F7C7C',
 	            defaultStyle: {
+	                border    : '1px solid #a8a8a8',
+	                boxSizing : 'border-box'
+	                // ,
+	                // height    : 30
+	            },
+
+	            defaultInnerStyle: {
+	                userSelect: 'none',
+	                width     : '100%',
 	                display   : 'inline-flex',
 	                flexFlow  : 'row',
-	                alignItems: 'stretch',
-	                border    : '1px solid #a8a8a8',
-	                boxSizing : 'border-box',
-	                height    : 30
+	                alignItems: 'stretch'
 	            },
 
 	            defaultInvalidStyle: {
@@ -159,7 +167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        this.valid = props.valid
 
-	        props.children = this.renderChildren(props, this.state)
+	        var children = this.renderChildren(props, this.state)
 
 	        // delete props.value
 
@@ -167,7 +175,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        delete divProps.value
 	        delete divProps.placeholder
 
-	        return React.createElement("div", React.__spread({},  divProps))
+	        return React.createElement("div", React.__spread({},  divProps), 
+	            React.createElement("div", {style: props.innerStyle}, 
+	                children
+	            )
+	        )
 	    },
 
 	    renderChildren: function(props, state){
@@ -224,6 +236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        return React.createElement("div", {
+	            key: "clearTool", 
 	            className: "z-clear-tool", 
 	            onClick: this.handleClearToolClick, 
 	            onMouseDown: this.handleClearToolMouseDown, 
@@ -342,17 +355,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        props.className = this.prepareClassName(props)
 	        props.style = this.prepareStyle(props)
+	        props.innerStyle = this.prepareInnerStyle(props)
 
 	        return props
 	    },
 
-	    prepareValue: function(props, state) {
-
-	        var value = props.value === undefined?
-	                        state.defaultValue:
-	                        props.value
+	    getValue: function() {
+	        var value = this.props.value === undefined?
+	                        this.state.defaultValue:
+	                        this.props.value
 
 	        return value
+	    },
+
+	    prepareValue: function(props, state) {
+	        return this.getValue()
 	    },
 
 	    prepareClassName: function(props) {
@@ -377,6 +394,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        return style
+	    },
+
+	    prepareInnerStyle: function(props) {
+	        var style = assign({}, props.defaultInnerStyle, props.innerStyle)
+
+	        return prefixer(style)
 	    },
 
 	    prepareInputProps: function(props) {
@@ -425,7 +448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)
 	        }
 
-	        return style
+	        return prefixer(style)
 	    },
 
 	    prepareClearToolStyle: function(props, state) {
@@ -505,6 +528,296 @@ return /******/ (function(modules) { // webpackBootstrap
 		return to;
 	};
 
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict'
+
+	var hasOwn         = __webpack_require__(4)
+	var getPrefixed    = __webpack_require__(5)
+
+	var map      = __webpack_require__(6)
+	var plugable = __webpack_require__(7)
+
+	function plugins(key, value){
+
+		var result = {
+			key  : key,
+			value: value
+		}
+
+		;(RESULT.plugins || []).forEach(function(fn){
+
+			var tmp = map(function(res){
+				return fn(key, value, res)
+			}, result)
+
+			if (tmp){
+				result = tmp
+			}
+		})
+
+		return result
+	}
+
+	function normalize(key, value){
+
+		var result = plugins(key, value)
+
+		return map(function(result){
+			return {
+				key  : getPrefixed(result.key),
+				value: result.value
+			}
+		}, result)
+
+		return result
+	}
+
+	var RESULT = function(style){
+		var k
+		var item
+		var result = {}
+
+		for (k in style) if (hasOwn(style, k)){
+			item = normalize(k, style[k])
+
+			if (!item){
+				continue
+			}
+
+			map(function(item){
+				result[item.key] = item.value
+			}, item)
+		}
+
+		return result
+	}
+
+	module.exports = plugable(RESULT)
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = function(obj, prop){
+		return Object.prototype.hasOwnProperty.call(obj, prop)
+	}
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(8)
+	var getPrefix    = __webpack_require__(9)
+
+	var properties = {
+	  'flex': 1,
+	  'flexFlow': 1,
+	  'userSelect': 1,
+	  'transform': 1,
+	  'transition': 1,
+	  'transformOrigin': 1,
+	  'transformStyle': 1,
+	  'transitionProperty': 1,
+	  'transitionDuration': 1,
+	  'transitionTimingFunction': 1,
+	  'transitionDelay': 1,
+	  'borderImage': 1,
+	  'borderImageSlice': 1,
+	  'boxShadow': 1,
+	  'backgroundClip': 1,
+	  'backfaceVisibility': 1,
+	  'perspective': 1,
+	  'perspectiveOrigin': 1,
+	  'animation': 1,
+	  'animationDuration': 1,
+	  'animationName': 1,
+	  'animationDelay': 1,
+	  'animationDirection': 1,
+	  'animationIterationCount': 1,
+	  'animationTimingFunction': 1,
+	  'animationPlayState': 1,
+	  'animationFillMode': 1,
+	  'appearance': 1
+	}
+
+
+	module.exports = function(key){
+
+		if (!properties[key]){
+			return key
+		}
+
+		var prefix = getPrefix(key)
+
+		return prefix?
+				prefix + toUpperFirst(key):
+				key
+
+	}
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = function(fn, item){
+
+		if (!item){
+			return
+		}
+
+		if (Array.isArray(item)){
+			return item.map(fn).filter(function(x){
+				return !!x
+			})
+		} else {
+			return fn(item)
+		}
+	}
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getCssPrefixed = __webpack_require__(10)
+
+	module.exports = function(target){
+		target.plugins = target.plugins || [
+			(function(){
+				var values = {
+					'flex':1,
+					'inline-flex':1
+				}
+
+				return function(key, value){
+					if (key === 'display' && value in values){
+						return {
+							key: key,
+							value: getCssPrefixed(key, value)
+						}
+					}
+				}
+			})()
+		]
+
+		target.plugin = function(fn){
+			target.plugins = target.plugins || []
+
+			target.plugins.push(fn)
+		}
+
+		return target
+	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = function(str){
+		return str?
+				str.charAt(0).toUpperCase() + str.slice(1):
+				''
+	}
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(8)
+	var prefixes     = ["ms", "Moz", "Webkit", "O"]
+
+	var el = __webpack_require__(11)
+
+	var PREFIX
+
+	module.exports = function(key){
+
+		if (PREFIX){
+			return PREFIX
+		}
+
+		var i = 0
+		var len = prefixes.length
+		var tmp
+		var prefix
+
+		for (; i < len; i++){
+			prefix = prefixes[i]
+			tmp = prefix + toUpperFirst(key)
+
+			if (typeof el.style[tmp] != 'undefined'){
+				return PREFIX = prefix
+			}
+		}
+	}
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(8)
+	var getPrefix    = __webpack_require__(9)
+	var getPrefixed  = __webpack_require__(5)
+	var el           = __webpack_require__(11)
+
+	var MEMORY = {}
+
+	module.exports = function(key, value){
+
+	    var k = key + ': ' + value
+
+	    if (MEMORY[k]){
+	        return MEMORY[k]
+	    }
+
+	    var prefix = getPrefix('appearance')
+	    var prefixed = getPrefixed(key)
+
+	    var prefixedValue = '-' + prefix.toLowerCase() + '-' + value
+
+	    el.style[prefixed] = prefixedValue
+
+	    if (el.style[prefixed] === prefixedValue){
+	        value = prefixedValue
+	    }
+
+	    MEMORY[k] = value
+
+	    return value
+	}
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var el
+
+	if(!!global.document){
+	  	el = global.document.createElement('div')
+	}
+
+	module.exports = el
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }
 /******/ ])
