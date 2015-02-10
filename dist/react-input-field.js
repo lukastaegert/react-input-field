@@ -269,7 +269,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return props.isEmpty(props, emptyValue)
 	        }
 
-	        return props.value + '' === emptyValue + ''
+	        var value = props.value
+
+	        if (value == null){
+	            value = ''
+	        }
+
+	        return value === emptyValue
 	    },
 
 	    getEmptyValue: function(props){
@@ -535,8 +541,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict'
 
-	var hasOwn         = __webpack_require__(4)
-	var getPrefixed    = __webpack_require__(5)
+	var hasOwn      = __webpack_require__(4)
+	var getPrefixed = __webpack_require__(5)
 
 	var map      = __webpack_require__(6)
 	var plugable = __webpack_require__(7)
@@ -619,8 +625,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var getPrefix    = __webpack_require__(9)
 
 	var properties = {
+	  'alignItems': 1,
+	  'justifyContent': 1,
 	  'flex': 1,
 	  'flexFlow': 1,
+
 	  'userSelect': 1,
 	  'transform': 1,
 	  'transition': 1,
@@ -788,15 +797,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return MEMORY[k]
 	    }
 
-	    var prefix = getPrefix('appearance')
-	    var prefixed = getPrefixed(key)
+	    el.style[key] = value
 
-	    var prefixedValue = '-' + prefix.toLowerCase() + '-' + value
+	    var prefix
+	    var prefixed
+	    var prefixedValue
 
-	    el.style[prefixed] = prefixedValue
+	    if (el.style[key] !== value){
 
-	    if (el.style[prefixed] === prefixedValue){
-	        value = prefixedValue
+	        prefix   = getPrefix('appearance')
+	        prefixed = getPrefixed(key)
+
+	        prefixedValue = '-' + prefix.toLowerCase() + '-' + value
+
+	        el.style[prefixed] = prefixedValue
+
+	        if (el.style[prefixed] === prefixedValue){
+	            value = prefixedValue
+	        }
 	    }
 
 	    MEMORY[k] = value
