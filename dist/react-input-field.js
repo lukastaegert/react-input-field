@@ -194,6 +194,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            children = (tools || []).concat(field)
 	        }
 
+	        if (typeof props.renderChildren == 'function'){
+	            children = props.renderChildren(children)
+	        }
+
 	        return children
 	    },
 
