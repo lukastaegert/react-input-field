@@ -704,6 +704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var el           = __webpack_require__(13)
 
 	var MEMORY = {}
+	var STYLE = el.style
 
 	module.exports = function(key, value){
 
@@ -713,23 +714,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return MEMORY[k]
 	    }
 
-	    el.style[key] = ''
-	    el.style[key] = value
-
 	    var prefix
 	    var prefixed
 
-	    if (el.style[key] === ''){//we have to prefix
+	    if (!(key in STYLE)){//we have to prefix
 
 	        prefix = getPrefix('appearance')
 
 	        if (prefix){
 	            prefixed = prefix + toUpperFirst(key)
 
-	            el.style[prefixed] = ''
-	            el.style[prefixed] = value
-
-	            if (el.style[prefixed] !== ''){
+	            if (prefixed in STYLE){
 	                key = prefixed
 	            }
 	        }
@@ -791,6 +786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var el            = __webpack_require__(13)
 
 	var MEMORY = {}
+	var STYLE = el.style
 
 	module.exports = function(key, value){
 
@@ -800,14 +796,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return MEMORY[k]
 	    }
 
-	    el.style[key] = ''
-	    el.style[key] = value
-
 	    var prefix
 	    var prefixed
 	    var prefixedValue
 
-	    if (el.style[key] === ''){
+	    if (!(key in STYLE)){
 
 	        prefix = getPrefix('appearance')
 
@@ -816,11 +809,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            prefixedValue = '-' + prefix.toLowerCase() + '-' + value
 
-	            el.style[prefixed] = ''
-	            el.style[prefixed] = prefixedValue
+	            if (prefixed in STYLE){
+	                el.style[prefixed] = ''
+	                el.style[prefixed] = prefixedValue
 
-	            if (el.style[prefixed] !== ''){
-	                value = prefixedValue
+	                if (el.style[prefixed] !== ''){
+	                    value = prefixedValue
+	                }
 	            }
 	        }
 	    }
