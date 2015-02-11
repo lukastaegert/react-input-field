@@ -2,8 +2,7 @@
 
 var assign = require('object-assign')
 var React  = require('react')
-var prefixer = require('react-style-normalizer')
-
+var normalize = require('react-style-normalizer')
 
 function emptyFn() {}
 
@@ -69,7 +68,7 @@ var DESCRIPTOR = {
             },
 
             defaultInputStyle: {
-                flex   : 1,
+                flex   : '1 auto',
                 border : 0,
                 height : '100%',
                 padding: '6px 2px',
@@ -353,7 +352,7 @@ var DESCRIPTOR = {
     prepareInnerStyle: function(props) {
         var style = assign({}, props.defaultInnerStyle, props.innerStyle)
 
-        return prefixer(style)
+        return normalize(style)
     },
 
     prepareInputProps: function(props) {
@@ -402,7 +401,7 @@ var DESCRIPTOR = {
             assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)
         }
 
-        return prefixer(style)
+        return normalize(style)
     },
 
     prepareClearToolStyle: function(props, state) {

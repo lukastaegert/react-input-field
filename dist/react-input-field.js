@@ -58,8 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var assign = __webpack_require__(2)
 	var React  = __webpack_require__(1)
-	var prefixer = __webpack_require__(3)
-
+	var normalize = __webpack_require__(3)
 
 	function emptyFn() {}
 
@@ -125,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            },
 
 	            defaultInputStyle: {
-	                flex   : 1,
+	                flex   : '1 auto',
 	                border : 0,
 	                height : '100%',
 	                padding: '6px 2px',
@@ -409,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    prepareInnerStyle: function(props) {
 	        var style = assign({}, props.defaultInnerStyle, props.innerStyle)
 
-	        return prefixer(style)
+	        return normalize(style)
 	    },
 
 	    prepareInputProps: function(props) {
@@ -458,7 +457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)
 	        }
 
-	        return prefixer(style)
+	        return normalize(style)
 	    },
 
 	    prepareClearToolStyle: function(props, state) {
@@ -543,7 +542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict'
+	'use strict';
 
 	var hasOwn      = __webpack_require__(4)
 	var getPrefixed = __webpack_require__(5)
@@ -578,7 +577,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		return map(function(result){
 			return {
-				key  : getPrefixed(result.key),
+				key  : getPrefixed(result.key, result.value),
 				value: result.value
 			}
 		}, result)
@@ -625,10 +624,127 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var toUpperFirst = __webpack_require__(8)
-	var getPrefix    = __webpack_require__(9)
+	var getStylePrefixed = __webpack_require__(8)
+	var properties       = __webpack_require__(9)
 
-	var properties = {
+	module.exports = function(key, value){
+
+		if (!properties[key]){
+			return key
+		}
+
+		return getStylePrefixed(key, value)
+	}
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = function(fn, item){
+
+		if (!item){
+			return
+		}
+
+		if (Array.isArray(item)){
+			return item.map(fn).filter(function(x){
+				return !!x
+			})
+		} else {
+			return fn(item)
+		}
+	}
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getCssPrefixedValue = __webpack_require__(10)
+
+	module.exports = function(target){
+		target.plugins = target.plugins || [
+			(function(){
+				var values = {
+					'flex':1,
+					'inline-flex':1
+				}
+
+				return function(key, value){
+					if (key === 'display' && value in values){
+						return {
+							key  : key,
+							value: getCssPrefixedValue(key, value)
+						}
+					}
+				}
+			})()
+		]
+
+		target.plugin = function(fn){
+			target.plugins = target.plugins || []
+
+			target.plugins.push(fn)
+		}
+
+		return target
+	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(11)
+	var getPrefix    = __webpack_require__(12)
+	var el           = __webpack_require__(13)
+
+	var MEMORY = {}
+
+	module.exports = function(key, value){
+
+	    var k = key + ': ' + value
+
+	    if (MEMORY[k]){
+	        return MEMORY[k]
+	    }
+
+	    el.style[key] = value
+
+	    var prefix
+	    var prefixed
+
+	    if (el.style[key] !== value){
+
+	        prefix = getPrefix('appearance')
+
+	        if (prefix){
+	            prefixed = prefix + toUpperFirst(key)
+
+	            el.style[prefixed] = value
+
+	            if (el.style[prefixed] === value){
+	                key = prefixed
+	            }
+	        }
+	    }
+
+	    MEMORY[k] = key
+
+	    return key
+	}
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
 	  'alignItems': 1,
 	  'justifyContent': 1,
 	  'flex': 1,
@@ -662,80 +778,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'appearance': 1
 	}
 
-
-	module.exports = function(key){
-
-		if (!properties[key]){
-			return key
-		}
-
-		var prefix = getPrefix(key)
-
-		return prefix?
-				prefix + toUpperFirst(key):
-				key
-
-	}
-
 /***/ },
-/* 6 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	module.exports = function(fn, item){
+	var getPrefix     = __webpack_require__(12)
+	var forcePrefixed = __webpack_require__(14)
+	var el            = __webpack_require__(13)
 
-		if (!item){
-			return
-		}
+	var MEMORY = {}
 
-		if (Array.isArray(item)){
-			return item.map(fn).filter(function(x){
-				return !!x
-			})
-		} else {
-			return fn(item)
-		}
+	module.exports = function(key, value){
+
+	    var k = key + ': ' + value
+
+	    if (MEMORY[k]){
+	        return MEMORY[k]
+	    }
+
+	    el.style[key] = value
+
+	    var prefix
+	    var prefixed
+	    var prefixedValue
+
+	    if (el.style[key] !== value){
+
+	        prefix = getPrefix('appearance')
+
+	        if (prefix){
+	            prefixed = forcePrefixed(key, value)
+
+	            prefixedValue = '-' + prefix.toLowerCase() + '-' + value
+
+	            el.style[prefixed] = prefixedValue
+
+	            if (el.style[prefixed] === prefixedValue){
+	                value = prefixedValue
+	            }
+	        }
+	    }
+
+	    MEMORY[k] = value
+
+	    return value
 	}
 
 /***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var getCssPrefixed = __webpack_require__(10)
-
-	module.exports = function(target){
-		target.plugins = target.plugins || [
-			(function(){
-				var values = {
-					'flex':1,
-					'inline-flex':1
-				}
-
-				return function(key, value){
-					if (key === 'display' && value in values){
-						return {
-							key: key,
-							value: getCssPrefixed(key, value)
-						}
-					}
-				}
-			})()
-		]
-
-		target.plugin = function(fn){
-			target.plugins = target.plugins || []
-
-			target.plugins.push(fn)
-		}
-
-		return target
-	}
-
-/***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -747,15 +839,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var toUpperFirst = __webpack_require__(8)
+	var toUpperFirst = __webpack_require__(11)
 	var prefixes     = ["ms", "Moz", "Webkit", "O"]
 
-	var el = __webpack_require__(11)
+	var el = __webpack_require__(13)
 
 	var PREFIX
 
@@ -781,53 +873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var toUpperFirst = __webpack_require__(8)
-	var getPrefix    = __webpack_require__(9)
-	var getPrefixed  = __webpack_require__(5)
-	var el           = __webpack_require__(11)
-
-	var MEMORY = {}
-
-	module.exports = function(key, value){
-
-	    var k = key + ': ' + value
-
-	    if (MEMORY[k]){
-	        return MEMORY[k]
-	    }
-
-	    el.style[key] = value
-
-	    var prefix
-	    var prefixed
-	    var prefixedValue
-
-	    if (el.style[key] !== value){
-
-	        prefix   = getPrefix('appearance')
-	        prefixed = getPrefixed(key)
-
-	        prefixedValue = '-' + prefix.toLowerCase() + '-' + value
-
-	        el.style[prefixed] = prefixedValue
-
-	        if (el.style[prefixed] === prefixedValue){
-	            value = prefixedValue
-	        }
-	    }
-
-	    MEMORY[k] = value
-
-	    return value
-	}
-
-/***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -840,6 +886,35 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = el
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(11)
+	var getPrefix    = __webpack_require__(12)
+	var properties   = __webpack_require__(9)
+
+	/**
+	 * Returns the given key prefixed, if the property is found in the prefixProps map.
+	 *
+	 * Does not test if the property supports the given value unprefixed.
+	 * If you need this, use './getPrefixed' instead
+	 */
+	module.exports = function(key, value){
+
+		if (!properties[key]){
+			return key
+		}
+
+		var prefix = getPrefix(key)
+
+		return prefix?
+					prefix + toUpperFirst(key):
+					key
+	}
 
 /***/ }
 /******/ ])
