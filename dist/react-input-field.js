@@ -124,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            },
 
 	            defaultInputStyle: {
-	                flex   : '1 auto',
+	                flex   : 1,
 	                border : 0,
 	                height : '100%',
 	                padding: '6px 2px',
@@ -707,27 +707,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = function(key, value){
 
-	    var k = key + ': ' + value
+	    var k = key// + ': ' + value
 
 	    if (MEMORY[k]){
 	        return MEMORY[k]
 	    }
 
+	    el.style[key] = ''
 	    el.style[key] = value
 
 	    var prefix
 	    var prefixed
 
-	    if (el.style[key] !== value){
+	    if (el.style[key] === ''){//we have to prefix
 
 	        prefix = getPrefix('appearance')
 
 	        if (prefix){
 	            prefixed = prefix + toUpperFirst(key)
 
+	            el.style[prefixed] = ''
 	            el.style[prefixed] = value
 
-	            if (el.style[prefixed] === value){
+	            if (el.style[prefixed] !== ''){
 	                key = prefixed
 	            }
 	        }
@@ -798,13 +800,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return MEMORY[k]
 	    }
 
+	    el.style[key] = ''
 	    el.style[key] = value
 
 	    var prefix
 	    var prefixed
 	    var prefixedValue
 
-	    if (el.style[key] !== value){
+	    if (el.style[key] === ''){
 
 	        prefix = getPrefix('appearance')
 
@@ -813,9 +816,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            prefixedValue = '-' + prefix.toLowerCase() + '-' + value
 
+	            el.style[prefixed] = ''
 	            el.style[prefixed] = prefixedValue
 
-	            if (el.style[prefixed] === prefixedValue){
+	            if (el.style[prefixed] !== ''){
 	                value = prefixedValue
 	            }
 	        }

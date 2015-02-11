@@ -68,7 +68,7 @@ var DESCRIPTOR = {
             },
 
             defaultInputStyle: {
-                flex   : '1 auto',
+                flex   : 1,
                 border : 0,
                 height : '100%',
                 padding: '6px 2px',
