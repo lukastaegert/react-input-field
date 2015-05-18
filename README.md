@@ -57,6 +57,7 @@ function onChange(value, fieldProps, event){
  * onChange(value: String, props: Object, event: Event) - a function to be called when the input value changes
  * placeholder: String - a placeholder for the input
  * readOnly: Boolean - the value for the readonly attribute for the input field
+ * autoFocus: Boolean - the value of the autoFocus attribute for the input
  * clearTool: Boolean/String/ReactElement - defaults to true. Whether to show a clear tool or not when field value is not empty. If the boolean true, ✖ will be rendered as a clear tool, otherwise, the given value will be used.
  * validate: Function - if given, it will be called with the value of the field. If it returns false, the field will have a css class that marks it as invalid (defaults to props.invalidClassName='z-invalid')
   * clearToolStyle: Object - a style for the clear tool
@@ -86,6 +87,7 @@ function onChange(value, fieldProps, event){
 * style - styles to be applied to the component
 * emptyStyle - styles to be applied to the component when the value is empty
 * invalidStyle - styles to be applied to the component when the value is invalid (as determined by the `validate` function prop)
+* focusedStyle - styles to be applied to the component when it is focused
 
 ## Validation
 

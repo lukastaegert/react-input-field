@@ -59,6 +59,10 @@ const DESCRIPTOR = {
                 boxSizing : 'border-box'
             },
 
+            defaultFocusedStyle: {
+                boxShadow: '0px 0px 2px 0px rgba(0, 0, 0, 0.45)'
+            },
+
             defaultInnerStyle: {
                 userSelect: 'none',
                 width     : '100%',
@@ -375,6 +379,10 @@ const DESCRIPTOR = {
     prepareStyle: function(props) {
         var style = assign({}, props.defaultStyle, props.style)
 
+        if (props.focused){
+            assign(style, props.defaultFocusedStyle, props.focusedStyle)
+        }
+
         if (props.empty){
             assign(style, props.emptyStyle)
         }
@@ -411,6 +419,7 @@ const DESCRIPTOR = {
         inputProps.name        = props.name
         inputProps.disabled    = props.disabled
         inputProps.readOnly    = props.readOnly
+        inputProps.autoFocus   = props.autoFocus
 
         return inputProps
     },
@@ -418,12 +427,16 @@ const DESCRIPTOR = {
     handleFocus: function(event){
         this._focused = true
 
+        //so as to apply focus style
+        this.setState({})
         //this.props.onFocus is called due to event propagation
     },
 
     handleBlur: function(){
         this._focused = false
 
+        //so as to unapply focus style
+        this.setState({})
         //this.props.onBlur is called due to event propagation
     },
 

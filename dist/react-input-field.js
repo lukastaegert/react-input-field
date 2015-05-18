@@ -122,6 +122,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                boxSizing: 'border-box'
 	            },
 
+	            defaultFocusedStyle: {
+	                boxShadow: '0px 0px 2px 0px rgba(0, 0, 0, 0.45)'
+	            },
+
 	            defaultInnerStyle: {
 	                userSelect: 'none',
 	                width: '100%',
@@ -438,6 +442,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    prepareStyle: function prepareStyle(props) {
 	        var style = assign({}, props.defaultStyle, props.style);
 
+	        if (props.focused) {
+	            assign(style, props.defaultFocusedStyle, props.focusedStyle);
+	        }
+
 	        if (props.empty) {
 	            assign(style, props.emptyStyle);
 	        }
@@ -474,22 +482,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        inputProps.name = props.name;
 	        inputProps.disabled = props.disabled;
 	        inputProps.readOnly = props.readOnly;
+	        inputProps.autoFocus = props.autoFocus;
 
 	        return inputProps;
 	    },
 
 	    handleFocus: function handleFocus(event) {
-	        this._focused = true
+	        this._focused = true;
 
-	        //this.props.onFocus is called due to event propagation
-	        ;
+	        //so as to apply focus style
+	        this.setState({});
 	    },
 
 	    handleBlur: function handleBlur() {
-	        this._focused = false
+	        this._focused = false;
 
-	        //this.props.onBlur is called due to event propagation
-	        ;
+	        //so as to unapply focus style
+	        this.setState({});
 	    },
 
 	    isFocused: function isFocused() {
@@ -545,6 +554,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = ReactClass;
 	module.exports = exports['default'];
+	//this.props.onFocus is called due to event propagation
+	//this.props.onBlur is called due to event propagation
 
 /***/ },
 /* 1 */
