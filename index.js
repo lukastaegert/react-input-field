@@ -105,6 +105,16 @@
 	                    'npm install --save react-input-field'
 	                ),
 	                _react2['default'].createElement(
+	                    'p',
+	                    null,
+	                    'Github: ',
+	                    _react2['default'].createElement(
+	                        'a',
+	                        { href: 'https://github.com/zippyui/react-input-field' },
+	                        'github.com/zippyui/react-input-field'
+	                    )
+	                ),
+	                _react2['default'].createElement(
 	                    'h3',
 	                    null,
 	                    'Field with clear Tool'

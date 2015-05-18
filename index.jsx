@@ -22,6 +22,8 @@ const App = class extends React.Component {
 
             <code>npm install --save react-input-field</code>
 
+            <p>Github: <a href="https://github.com/zippyui/react-input-field">github.com/zippyui/react-input-field</a></p>
+
 
             <h3>Field with clear Tool</h3>
             <Field defaultValue="text here" />
