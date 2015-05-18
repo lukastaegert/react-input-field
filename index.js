@@ -46,13 +46,7 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 	__webpack_require__(2);
 
@@ -72,101 +66,87 @@
 
 	var VALUE = 'hello React';
 
-	var App = (function (_React$Component) {
-	    var _class = function App() {
-	        _classCallCheck(this, _class);
+	var App = _react2['default'].createClass({
+	    displayName: 'App',
 
-	        if (_React$Component != null) {
-	            _React$Component.apply(this, arguments);
+	    render: function render() {
+
+	        function validate(v) {
+	            return !!v;
 	        }
-	    };
 
-	    _inherits(_class, _React$Component);
-
-	    _createClass(_class, [{
-	        key: 'render',
-	        value: function render() {
-
-	            function validate(v) {
-	                return !!v;
-	            }
-
-	            return _react2['default'].createElement(
-	                'div',
+	        return _react2['default'].createElement(
+	            'div',
+	            null,
+	            _react2['default'].createElement(
+	                'h1',
 	                null,
+	                'React Input field'
+	            ),
+	            _react2['default'].createElement(
+	                'code',
+	                null,
+	                'npm install --save react-input-field'
+	            ),
+	            _react2['default'].createElement(
+	                'p',
+	                null,
+	                'Github: ',
 	                _react2['default'].createElement(
-	                    'h1',
-	                    null,
-	                    'React Input field'
-	                ),
-	                _react2['default'].createElement(
-	                    'code',
-	                    null,
-	                    'npm install --save react-input-field'
-	                ),
-	                _react2['default'].createElement(
-	                    'p',
-	                    null,
-	                    'Github: ',
-	                    _react2['default'].createElement(
-	                        'a',
-	                        { href: 'https://github.com/zippyui/react-input-field' },
-	                        'github.com/zippyui/react-input-field'
-	                    )
-	                ),
-	                _react2['default'].createElement(
-	                    'h3',
-	                    null,
-	                    'Field with clear Tool'
-	                ),
-	                _react2['default'].createElement(_reactInputField2['default'], { defaultValue: 'text here' }),
-	                _react2['default'].createElement(
-	                    'h3',
-	                    null,
-	                    'Field with placeholder'
-	                ),
-	                _react2['default'].createElement(_reactInputField2['default'], { placeholder: 'Your name' }),
-	                _react2['default'].createElement(
-	                    'h3',
-	                    null,
-	                    'Field with validation - invalid on empty'
-	                ),
-	                _react2['default'].createElement(_reactInputField2['default'], { validate: validate }),
-	                _react2['default'].createElement(
-	                    'h3',
-	                    null,
-	                    'Synced fields - controlled behaviour'
-	                ),
-	                _react2['default'].createElement(
-	                    'p',
-	                    null,
-	                    _react2['default'].createElement(_reactInputField2['default'], { style: { marginBottom: 10 }, value: VALUE, onChange: this.onChange }),
-	                    _react2['default'].createElement(_reactInputField2['default'], { value: VALUE, onChange: this.onChange })
-	                ),
-	                _react2['default'].createElement(
-	                    'h3',
-	                    null,
-	                    'Field without clear tool'
-	                ),
-	                _react2['default'].createElement(_reactInputField2['default'], { clearTool: false, defaultValue: 'no clear tool' }),
-	                _react2['default'].createElement(
-	                    'h3',
-	                    null,
-	                    'Field with custom clear tool'
-	                ),
-	                _react2['default'].createElement(_reactInputField2['default'], { clearTool: customClearTool, defaultValue: 'custom clear tool' })
-	            );
-	        }
-	    }, {
-	        key: 'onChange',
-	        value: function onChange(v) {
-	            VALUE = v;
-	            this.setState({});
-	        }
-	    }]);
+	                    'a',
+	                    { href: 'https://github.com/zippyui/react-input-field' },
+	                    'github.com/zippyui/react-input-field'
+	                )
+	            ),
+	            _react2['default'].createElement(
+	                'h3',
+	                null,
+	                'Field with clear Tool'
+	            ),
+	            _react2['default'].createElement(_reactInputField2['default'], { defaultValue: 'text here' }),
+	            _react2['default'].createElement(
+	                'h3',
+	                null,
+	                'Field with placeholder'
+	            ),
+	            _react2['default'].createElement(_reactInputField2['default'], { placeholder: 'Your name' }),
+	            _react2['default'].createElement(
+	                'h3',
+	                null,
+	                'Field with validation - invalid on empty'
+	            ),
+	            _react2['default'].createElement(_reactInputField2['default'], { validate: validate }),
+	            _react2['default'].createElement(
+	                'h3',
+	                null,
+	                'Synced fields - controlled behaviour'
+	            ),
+	            _react2['default'].createElement(
+	                'p',
+	                null,
+	                _react2['default'].createElement(_reactInputField2['default'], { style: { marginBottom: 10 }, value: VALUE, onChange: this.onChange }),
+	                _react2['default'].createElement(_reactInputField2['default'], { value: VALUE, onChange: this.onChange })
+	            ),
+	            _react2['default'].createElement(
+	                'h3',
+	                null,
+	                'Field without clear tool'
+	            ),
+	            _react2['default'].createElement(_reactInputField2['default'], { clearTool: false, defaultValue: 'no clear tool' }),
+	            _react2['default'].createElement(
+	                'h3',
+	                null,
+	                'Field with custom clear tool'
+	            ),
+	            _react2['default'].createElement(_reactInputField2['default'], { clearTool: customClearTool, defaultValue: 'custom clear tool' })
+	        );
+	    },
 
-	    return _class;
-	})(_react2['default'].Component);
+	    onChange: function onChange(v) {
+	        VALUE = v;
+	        this.setState({});
+	    }
+	});
 
 	_react2['default'].render(_react2['default'].createElement(App, null), document.getElementById('content'));
 

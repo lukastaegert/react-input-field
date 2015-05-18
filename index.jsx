@@ -9,7 +9,7 @@ const customClearTool = <span style={{fontWeight: 'bold'}}>✓</span>
 
 let VALUE = "hello React"
 
-const App = class extends React.Component {
+const App = React.createClass({
 
     render(){
 
@@ -52,12 +52,12 @@ const App = class extends React.Component {
             <Field clearTool={customClearTool} defaultValue="custom clear tool"/>
 
         </div>
-    }
+    },
 
     onChange(v) {
     	VALUE = v
     	this.setState({})
     }
-}
+})
 
 React.render(<App />, document.getElementById('content'))
