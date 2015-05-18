@@ -111,6 +111,16 @@
 	            ),
 	            _react2['default'].createElement(_reactInputField2['default'], { placeholder: 'Your name' }),
 	            _react2['default'].createElement(
+	                'p',
+	                { style: { marginBottom: 10, color: 'gray', border: '1px solid gray', padding: 20, display: 'inline-block' } },
+	                'Hey! Just in case you are interested in a DataGrid, check out ',
+	                _react2['default'].createElement(
+	                    'a',
+	                    { href: 'http://zippyui.github.io/react-datagrid', target: '_blank' },
+	                    'zippyui.github.io/react-datagrid'
+	                )
+	            ),
+	            _react2['default'].createElement(
 	                'h3',
 	                null,
 	                'Field with validation - invalid on empty'
