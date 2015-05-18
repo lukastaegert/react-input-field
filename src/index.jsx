@@ -11,19 +11,22 @@ var TOOL_STYLES = {
     false: {cursor: 'text', color: 'transparent'}
 }
 
-var INDEX = 0
+var INDEX        = 0
+var DISPLAY_NAME = 'ReactInputField'
+
+var PT = React.PropTypes
 
 var DESCRIPTOR = {
 
-    displayName: 'ReactInputField',
+    displayName: DISPLAY_NAME,
 
     propTypes: {
-        validate : React.PropTypes.oneOfType([
-            React.PropTypes.func,
-            React.PropTypes.bool
+        validate : PT.oneOfType([
+            PT.func,
+            PT.bool
         ]),
-        isEmpty  : React.PropTypes.func,
-        clearTool: React.PropTypes.bool
+        isEmpty  : PT.func,
+        clearTool: PT.bool
     },
 
     getInitialState: function(){
@@ -34,8 +37,8 @@ var DESCRIPTOR = {
 
     getDefaultProps: function () {
         return {
-            focusOnClick: true,
 
+            //STYLE props
             defaultClearToolStyle: {
                 fontSize   : 20,
                 paddingRight: 5,
@@ -46,13 +49,14 @@ var DESCRIPTOR = {
                 userSelect : 'none',
                 boxSizing: 'border-box'
             },
+
             clearToolColor    : '#a8a8a8',
             clearToolOverColor: '#7F7C7C',
+
             defaultStyle: {
                 border    : '1px solid #a8a8a8',
+                overflow  : 'hidden',
                 boxSizing : 'border-box'
-                // ,
-                // height    : 30
             },
 
             defaultInnerStyle: {
@@ -80,15 +84,23 @@ var DESCRIPTOR = {
 
             },
 
-            emptyValue: '',
-            inputClassName: '',
-            inputProps    : null,
-
-            clearTool: true,
-
+            //CLASS NAME
             defaultClassName: 'z-field',
             emptyClassName  : 'z-empty-value',
             invalidClassName: 'z-invalid',
+
+            inputClassName: '',
+
+            //NON-STYLE props
+            focusOnClick: true,
+            stopChangePropagation: true,
+            stopSelectPropagation: true,
+
+            defaultValue  : '',
+            emptyValue    : '',
+            inputProps    : null,
+
+            clearTool: true,
 
             toolsPosition: 'right'
         }
@@ -100,25 +112,21 @@ var DESCRIPTOR = {
             this.valid = true
         }
 
-        var props = this.prepareProps(this.props, this.state)
+        var props = this.p = this.prepareProps(this.props, this.state)
 
         if (this.valid !== props.valid && typeof props.onValidityChange === 'function'){
-            setTimeout(function(){
-                props.onValidityChange(props.valid, props.value, props)
-            }, 0)
+            setTimeout(() => props.onValidityChange(props.valid, props.value, props), 0)
         }
 
         this.valid = props.valid
 
         var children = this.renderChildren(props, this.state)
 
-        // delete props.value
-
         var divProps = assign({}, props)
         delete divProps.value
         delete divProps.placeholder
 
-        return <div {...divProps}>
+        return <div {...divProps} data-display-name={DISPLAY_NAME}>
             <div style={props.innerStyle}>
                 {children}
             </div>
@@ -170,11 +178,22 @@ var DESCRIPTOR = {
 
     renderClearTool: function(props, state) {
 
-        if (!props.clearTool || props.readOnly || props.disabled){
+        var visible
+
+        if (props.forceClearTool && !props.clearTool){
             return
         }
 
-        var visible         = !this.isEmpty(props)
+        if (!props.forceClearTool){
+            if (!props.clearTool || props.readOnly || props.disabled){
+                return
+            }
+        }
+
+        visible = props.forceClearTool?
+                    true:
+                    !props.empty
+
         var visibilityStyle = TOOL_STYLES[visible]
         var style           = assign({}, visibilityStyle, this.prepareClearToolStyle(props, state))
 
@@ -185,10 +204,10 @@ var DESCRIPTOR = {
         return <div
             key='clearTool'
             className='z-clear-tool'
-            onClick={this.handleClearToolClick}
-            onMouseDown={this.handleClearToolMouseDown}
-            onMouseOver={this.handleClearToolOver}
-            onMouseOut={this.handleClearToolOut}
+            onClick     ={this.handleClearToolClick}
+            onMouseDown ={this.handleClearToolMouseDown}
+            onMouseOver ={this.handleClearToolOver}
+            onMouseOut  ={this.handleClearToolOut}
             style={style}
         >✖</div>
     },
@@ -240,7 +259,7 @@ var DESCRIPTOR = {
         var result = true
 
         if (typeof props.validate === 'function'){
-            result = props.validate(value, props) !== false
+            result = props.validate(value, props, this) !== false
         }
 
         return result
@@ -262,24 +281,29 @@ var DESCRIPTOR = {
         if (this.props.focusOnClick && !this.isFocused()){
             this.focus()
         }
+
+        ;(this.props.onClick || emptyFn)(event)
     },
 
     handleMouseDown: function(event) {
         ;(this.props.onMouseDown || emptyFn)(event)
-        // event.preventDefault()
     },
 
     handleClearToolClick: function(event) {
-        this.notify(this.getEmptyValue(this.props), event)
+        var emptyValue = this.getEmptyValue(this.props)
+
+        this.notify(emptyValue, event)
+
+        ;(this.props.onClearToolClick || emptyFn)(emptyValue, event)
     },
 
     handleChange: function(event) {
-        event.stopPropagation()
+        this.props.stopChangePropagation && event.stopPropagation()
         this.notify(event.target.value, event)
     },
 
     handleSelect: function(event) {
-        event.stopPropagation()
+        this.props.stopSelectPropagation && event.stopPropagation()
         ;(this.props.onSelect || emptyFn)(event)
     },
 
@@ -302,12 +326,16 @@ var DESCRIPTOR = {
         assign(props, thisProps)
 
         props.value = this.prepareValue(props, state)
-        props.valid = this.isValid(props)
-        props.onClick = this.handleClick
+
+        props.focused = this.isFocused()
+        props.valid   = this.isValid(props)
+        props.empty   = this.isEmpty(props)
+
+        props.onClick     = this.handleClick
         props.onMouseDown = this.handleMouseDown
 
-        props.className = this.prepareClassName(props)
-        props.style = this.prepareStyle(props)
+        props.className  = this.prepareClassName(props)
+        props.style      = this.prepareStyle(props)
         props.innerStyle = this.prepareInnerStyle(props)
 
         return props
@@ -326,9 +354,12 @@ var DESCRIPTOR = {
     },
 
     prepareClassName: function(props) {
-        var result = [props.className, props.defaultClassName]
+        var result = [
+            props.className,
+            props.defaultClassName
+        ]
 
-        if (this.isEmpty(props)){
+        if (props.empty){
             result.push(props.emptyClassName)
         }
 
@@ -336,11 +367,15 @@ var DESCRIPTOR = {
             result.push(props.invalidClassName)
         }
 
-        return result.join(' ')
+        return result.filter(cls => !!cls).join(' ')
     },
 
     prepareStyle: function(props) {
         var style = assign({}, props.defaultStyle, props.style)
+
+        if (props.empty){
+            assign(style, props.emptyStyle)
+        }
 
         if (!props.valid){
             assign(style, props.defaultInvalidStyle, props.invalidStyle)
@@ -378,12 +413,16 @@ var DESCRIPTOR = {
         return inputProps
     },
 
-    handleFocus: function(){
+    handleFocus: function(event){
         this._focused = true
+
+        //this.props.onFocus is called due to event propagation
     },
 
     handleBlur: function(){
         this._focused = false
+
+        //this.props.onBlur is called due to event propagation
     },
 
     isFocused: function(){
@@ -396,6 +435,10 @@ var DESCRIPTOR = {
                             null
 
         var style = assign({}, props.defaultInputStyle, props.inputStyle, inputStyle)
+
+        if (props.empty){
+            assign(style, props.inputEmptyStyle)
+        }
 
         if (!props.valid){
             assign(style, props.defaultInputInvalidStyle, props.inputInvalidStyle)

@@ -9,8 +9,9 @@ var VALUE = 'xxx'
 
 var App = React.createClass({
 
-    onChange: function(value){
+    onChange: function(value,props, e){
         VALUE = value
+        console.log(value, e);
         this.setState({})
     },
 
@@ -22,15 +23,19 @@ var App = React.createClass({
             width: '50%'
         }
 
-        function validate(value){
-            return value + '' !== ''
+        function validate(value, props, x){
+            return x.isEmpty(value)
+        }
+
+        function focus(v, e){
+            console.log('focused', v, e);
         }
 
         // <Field placeholder="x" style={style} label='First Name' value={VALUE} onChange={this.onChange}/>
 
         return (
             <div className="App" style={{padding: 10}}>
-                <Field name="AAA" placeholder="test" clearTool={true} validate={validate} style={style} xdefaultValue={VALUE} onChange={this.onChange}/>
+                <Field  name="AAA" dixsabled={true} placeholder="test" clearTool={true} validate={validate} style={style} defaultValue={VALUE} onChange={this.onChange}/>
             </div>
         )
     }
