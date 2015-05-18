@@ -33,9 +33,11 @@ var App = React.createClass({
 
         // <Field placeholder="x" style={style} label='First Name' value={VALUE} onChange={this.onChange}/>
 
+        var ct = <span>xxx</span>
+
         return (
             <div className="App" style={{padding: 10}}>
-                <Field  name="AAA" dixsabled={true} placeholder="test" clearTool={true} validate={validate} style={style} defaultValue={VALUE} onChange={this.onChange}/>
+                <Field name="AAA" dixsabled={true} placeholder="test" clearTool={ct} validate={validate} style={style} defaultValue={VALUE} onChange={this.onChange}/>
             </div>
         )
     }

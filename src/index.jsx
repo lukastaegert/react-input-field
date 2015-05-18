@@ -1,22 +1,21 @@
 'use strict';
 
-var assign = require('object-assign')
-var React  = require('react')
-var normalize = require('react-style-normalizer')
+const React     = require('react')
+const normalize = require('react-style-normalizer')
+const assign    = require('object-assign')
 
 function emptyFn() {}
 
-var TOOL_STYLES = {
+const TOOL_STYLES = {
     true : {display: 'inline-block'},
     false: {cursor: 'text', color: 'transparent'}
 }
 
-var INDEX        = 0
-var DISPLAY_NAME = 'ReactInputField'
+const DISPLAY_NAME = 'ReactInputField'
 
-var PT = React.PropTypes
+const PT = React.PropTypes
 
-var DESCRIPTOR = {
+const DESCRIPTOR = {
 
     displayName: DISPLAY_NAME,
 
@@ -26,7 +25,8 @@ var DESCRIPTOR = {
             PT.bool
         ]),
         isEmpty  : PT.func,
-        clearTool: PT.bool
+        clearTool: PT.node,
+        value    : PT.string
     },
 
     getInitialState: function(){
@@ -44,10 +44,10 @@ var DESCRIPTOR = {
                 paddingRight: 5,
                 paddingLeft : 5,
 
-                alignSelf  : 'center',
-                cursor     : 'pointer',
-                userSelect : 'none',
-                boxSizing: 'border-box'
+                alignSelf : 'center',
+                cursor    : 'pointer',
+                userSelect: 'none',
+                boxSizing : 'border-box'
             },
 
             clearToolColor    : '#a8a8a8',
@@ -201,6 +201,8 @@ var DESCRIPTOR = {
             assign(style, visibilityStyle)
         }
 
+        var tool = props.clearTool === true? '✖': props.clearTool
+
         return <div
             key='clearTool'
             className='z-clear-tool'
@@ -209,7 +211,7 @@ var DESCRIPTOR = {
             onMouseOver ={this.handleClearToolOver}
             onMouseOut  ={this.handleClearToolOut}
             style={style}
-        >✖</div>
+        >{tool}</div>
     },
 
     handleClearToolMouseDown: function(event) {
@@ -481,8 +483,8 @@ var DESCRIPTOR = {
     }
 }
 
-var ReactClass = React.createClass(DESCRIPTOR)
+const ReactClass = React.createClass(DESCRIPTOR)
 
 ReactClass.descriptor = DESCRIPTOR
 
-module.exports = ReactClass
+export default ReactClass

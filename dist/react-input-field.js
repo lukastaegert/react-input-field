@@ -56,11 +56,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var assign = __webpack_require__(2);
 	var React = __webpack_require__(7);
 	var normalize = __webpack_require__(3);
+	var assign = __webpack_require__(2);
 
 	function emptyFn() {}
 
@@ -69,7 +73,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    'false': { cursor: 'text', color: 'transparent' }
 	};
 
-	var INDEX = 0;
 	var DISPLAY_NAME = 'ReactInputField';
 
 	var PT = React.PropTypes;
@@ -85,7 +88,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    propTypes: {
 	        validate: PT.oneOfType([PT.func, PT.bool]),
 	        isEmpty: PT.func,
-	        clearTool: PT.bool
+	        clearTool: PT.node,
+	        value: PT.string
 	    },
 
 	    getInitialState: function getInitialState() {
@@ -264,6 +268,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            assign(style, visibilityStyle);
 	        }
 
+	        var tool = props.clearTool === true ? '✖' : props.clearTool;
+
 	        return React.createElement(
 	            'div',
 	            {
@@ -275,7 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                onMouseOut: this.handleClearToolOut,
 	                style: style
 	            },
-	            '✖'
+	            tool
 	        );
 	    },
 
@@ -537,7 +543,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	ReactClass.descriptor = DESCRIPTOR;
 
-	module.exports = ReactClass;
+	exports['default'] = ReactClass;
+	module.exports = exports['default'];
 
 /***/ },
 /* 1 */
