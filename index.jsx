@@ -1,46 +1,61 @@
 'use strict';
 
-var React = require('react')
-var Field = require('./src')
+import './index.styl'
 
-require('./index.styl')
+import React from 'react'
+import Field from 'react-input-field'
 
-var VALUE = 'xxx'
+const customClearTool = <span style={{fontWeight: 'bold'}}>✓</span>
 
-var App = React.createClass({
+let VALUE = "hello React"
 
-    onChange: function(value,props, e){
-        VALUE = value
-        console.log(value, e);
-        this.setState({})
-    },
+const App = class extends React.Component {
+
+    render(){
+
+    	function validate(v){
+    		return !!v
+    	}
+
+        return <div>
+            <h1>React Input field</h1>
+
+            <code>npm install --save react-input-field</code>
 
 
+            <h3>Field with clear Tool</h3>
+            <Field defaultValue="text here" />
 
-    render: function() {
 
-        var style = {
-            width: '50%'
-        }
+            <h3>Field with placeholder</h3>
+            <Field placeholder="Your name" />
 
-        function validate(value, props, x){
-            return x.isEmpty(value)
-        }
 
-        function focus(v, e){
-            console.log('focused', v, e);
-        }
+            <h3>Field with validation - invalid on empty</h3>
+            <Field validate={validate} />
 
-        // <Field placeholder="x" style={style} label='First Name' value={VALUE} onChange={this.onChange}/>
 
-        var ct = <span>xxx</span>
+            <h3>Synced fields - controlled behaviour</h3>
+            <p>
+            	<Field style={{marginBottom: 10}} value={VALUE} onChange={this.onChange}/>
+            	<Field value={VALUE} onChange={this.onChange}/>
+            </p>
 
-        return (
-            <div className="App" style={{padding: 10}}>
-                <Field name="AAA" dixsabled={true} placeholder="test" clearTool={ct} validate={validate} style={style} defaultValue={VALUE} onChange={this.onChange}/>
-            </div>
-        )
+
+            <h3>Field without clear tool</h3>
+            <Field clearTool={false} defaultValue="no clear tool"/>
+
+
+            <h3>Field with custom clear tool</h3>
+            <Field clearTool={customClearTool} defaultValue="custom clear tool"/>
+
+        </div>
     }
-})
+
+    onChange(v) {
+    	VALUE = v
+    	this.setState({})
+    }
+}
 
 React.render(<App />, document.getElementById('content'))

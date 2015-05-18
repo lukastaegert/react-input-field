@@ -1,11 +1,8 @@
-'use strict';
-
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
     entry: {
-        'index': './index.styl',
-        'index-no-normalize': './style/index.styl'
+        'index': './index.styl'
     },
     output: {
         filename: 'index.css'

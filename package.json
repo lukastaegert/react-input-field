@@ -1,60 +1,41 @@
 {
-  "name": "react-input-field",
-  "version": "1.2.1",
-  "description": "React Input Field",
-  "main": "lib/index.js",
+  "name": "react-input-field-www",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A carefully crafted input field for React",
+  "main": "index.js",
+  "scripts": {
+    "build-css": "webpack --progress --colors --config build-css.config.js",
+    "build-script": "webpack --progress --colors --config build-script.config.js",
+    "build": "npm run build-script && npm run build-css",
+    "dev": "webpack-dev-server --progress --colors --port 8091"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/zippyui/react-input-field.git"
   },
-  "scripts": {
-    "test": "make",
-    "lib": "gulp",
-    "build-style": "webpack --progress --colors --config build-style.config.js",
-    "dist": "webpack --progress --colors --config dist.config.js",
-    "dist.min": "webpack --progress --colors --optimize-minimize --optimize-occurence-order --optimize-dedupe --config dist.min.config.js",
-    "build": "npm run lib && npm run dist && npm run dist.min && npm run build-style",
-    "dev": "webpack-dev-server --progress --colors --port 9090"
-  },
-  "devDependencies": {
-    "babel-core": "^5.4.3",
-    "babel-loader": "^5.1.2",
-    "babel-plugin-closure-elimination": "0.0.1",
-    "css-loader": "^0.9.0",
-    "extract-text-webpack-plugin": "^0.3.5",
-    "gulp": "^3.8.10",
-    "gulp-babel": "^5.1.0",
-    "gulp-react": "^2.0.0",
-    "http-server": "^0.7.3",
-    "jsx-loader": "^0.12.2",
-    "node-libs-browser": "^0.5.0",
-    "style-loader": "^0.8.2",
-    "stylus-loader": "^0.4.0",
-    "webpack": "^1.9.7",
-    "webpack-dev-server": "^1.8.2"
-  },
-  "dependencies": {
-    "normalize.css": "^3.0.2",
-    "object-assign": "^2.0.0",
-    "react-style-normalizer": "^1.2.8"
-  },
-  "peerDependencies": {
-    "react": ">=0.12.0"
-  },
-  "keywords": [
-    "input",
-    "field",
-    "textfield",
-    "text",
-    "react-component",
-    "text-field",
-    "input-field",
-    "react"
-  ],
-  "author": "ZippyUI <contact@zippyui.com>",
+  "author": "ZippyUI",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zippyui/react-input-field/issues"
   },
-  "homepage": "https://github.com/zippyui/react-input-field"
+  "homepage": "https://github.com/zippyui/react-input-field",
+  "devDependencies": {
+    "babel-core": "^5.4.3",
+    "babel-loader": "^5.1.2",
+    "babel-plugin-closure-elimination": "0.0.1",
+    "css-loader": "^0.12.1",
+    "extract-text-webpack-plugin": "^0.8.0",
+    "grunt-babel": "^5.0.0",
+    "node-libs-browser": "^0.5.0",
+    "style-loader": "^0.12.2",
+    "stylus-loader": "^1.1.1",
+    "webpack": "^1.9.7",
+    "webpack-dev-server": "^1.8.2"
+  },
+  "dependencies": {
+    "normalize.css": "^3.0.3",
+    "react": "^0.13.3",
+    "react-input-field": "^1.2.2"
+  }
 }

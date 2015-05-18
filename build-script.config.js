@@ -1,10 +1,9 @@
+'use strict';
+
 module.exports = {
-    entry: './src/index.jsx',
+    entry: './index.jsx',
     output: {
-        path         : __dirname + '/dist',
-        libraryTarget: 'umd',
-        library      : 'ReactInputField',
-        filename     : 'react-input-field.min.js'
+        filename: 'index.js'
     },
     module: {
         loaders: require('./loaders.config')
