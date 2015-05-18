@@ -3,6 +3,8 @@ react-input-field
 
 > A carefully crafted input field for React
 
+See demo at [http://zippyui.com/react-input-field/](http://zippyui.com/react-input-field/)
+
 ## Features
 
  * support for clear tool
