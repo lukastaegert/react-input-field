@@ -52,7 +52,7 @@ const App = React.createClass({
             <Field clearTool={customClearTool} defaultValue="custom clear tool"/>
 
         </div>
-    },
+    }
 
     onChange(v) {
     	VALUE = v
