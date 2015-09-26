@@ -152,7 +152,7 @@ For setting up & starting the project locally, use:
 $ git clone https://github.com/zippyui/react-input-field
 $ cd react-input-field
 $ npm install
-$ npm run-script dev
+$ npm run dev
 ```
 
 Now navigate to [localhost:9090](http://localhost:9090/)
