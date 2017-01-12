@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zippyui/react-input-field.git"
+    "url": "https://github.com/andyl/react-input-field.git"
   },
   "scripts": {
     "test": "make",
@@ -54,7 +54,7 @@
   "author": "ZippyUI <contact@zippyui.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zippyui/react-input-field/issues"
+    "url": "https://github.com/andyl/react-input-field/issues"
   },
-  "homepage": "https://github.com/zippyui/react-input-field"
+  "homepage": "https://github.com/andyl/react-input-field"
 }

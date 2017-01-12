@@ -3,8 +3,6 @@ react-input-field
 
 > A carefully crafted input field for React
 
-See demo at [http://zippyui.com/react-input-field/](http://zippyui.com/react-input-field/)
-
 ## Features
 
  * support for clear tool
@@ -142,14 +140,14 @@ function onFocus(event){
 
 ## Contributing
 
-Use [Github issues](https://github.com/zippyui/react-input-field/issues) for feature requests and bug reports.
+Use [Github issues](https://github.com/andyl/react-input-field/issues) for feature requests and bug reports.
 
 We actively welcome pull requests.
 
 For setting up & starting the project locally, use:
 
 ```sh
-$ git clone https://github.com/zippyui/react-input-field
+$ git clone https://github.com/andyl/react-input-field
 $ cd react-input-field
 $ npm install
 $ npm run dev
