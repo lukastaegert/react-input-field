@@ -7,7 +7,7 @@
 		exports["ReactInputField"] = factory(require("React"));
 	else
 		root["ReactInputField"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_7__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -62,9 +62,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var React = __webpack_require__(7);
-	var normalize = __webpack_require__(3);
-	var assign = __webpack_require__(2);
+	var React = __webpack_require__(1);
+	var normalize = __webpack_require__(2);
+	var assign = __webpack_require__(14);
 
 	function emptyFn() {}
 
@@ -88,8 +88,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    propTypes: {
 	        validate: PT.oneOfType([PT.func, PT.bool]),
 	        isEmpty: PT.func,
-	        clearTool: PT.node,
-	        value: PT.string
+	        clearTool: PT.oneOfType([PT.node, PT.bool]),
+	        value: PT.string,
+
+	        defaultClearToolStyle: PT.object,
+	        clearToolColor: PT.string,
+	        clearToolOverColor: PT.string,
+	        defaultStyle: PT.object,
+	        defaultFocusedStyle: PT.object,
+	        defaultInnerStyle: PT.object,
+	        defaultInvalidStyle: PT.object,
+	        defaultInputStyle: PT.object,
+	        defaultInputInvalidStyle: PT.object,
+	        focusedStyle: PT.object,
+	        defaultClassName: PT.string,
+	        emptyClassName: PT.string,
+	        invalidClassName: PT.string,
+	        inputClassName: PT.string,
+	        focusOnClick: PT.bool,
+	        stopChangePropagation: PT.bool,
+	        stopSelectPropagation: PT.bool,
+	        emptyValue: PT.string,
+	        inputProps: PT.object,
+	        toolsPosition: PT.string,
+	        focused: PT.bool,
+	        valid: PT.bool,
+	        empty: PT.bool,
+	        innerStyle: PT.object,
+	        onClearToolClick: PT.func
 	    },
 
 	    getInitialState: function getInitialState() {
@@ -191,7 +217,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var children = this.renderChildren(props, this.state);
 
-	        var divProps = assign({}, props);
+	        var divProps = {};
+	        Object.keys(props).forEach(function (propName) {
+	            if (!DESCRIPTOR.propTypes[propName]) {
+	                divProps[propName] = props[propName];
+	            }
+	        });
 	        delete divProps.value;
 	        delete divProps.placeholder;
 
@@ -492,6 +523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        //so as to apply focus style
 	        this.setState({});
+	        //this.props.onFocus is called due to event propagation
 	    },
 
 	    handleBlur: function handleBlur() {
@@ -499,6 +531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        //so as to unapply focus style
 	        this.setState({});
+	        //this.props.onBlur is called due to event propagation
 	    },
 
 	    isFocused: function isFocused() {
@@ -554,44 +587,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = ReactClass;
 	module.exports = exports['default'];
-	//this.props.onFocus is called due to event propagation
-	//this.props.onBlur is called due to event propagation
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
-
-	var getCssPrefixedValue = __webpack_require__(10)
-
-	module.exports = function(target){
-		target.plugins = target.plugins || [
-			(function(){
-				var values = {
-					'flex':1,
-					'inline-flex':1
-				}
-
-				return function(key, value){
-					if (key === 'display' && value in values){
-						return {
-							key  : key,
-							value: getCssPrefixedValue(key, value, true)
-						}
-					}
-				}
-			})()
-		]
-
-		target.plugin = function(fn){
-			target.plugins = target.plugins || []
-
-			target.plugins.push(fn)
-		}
-
-		return target
-	}
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ },
 /* 2 */
@@ -599,43 +600,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	function ToObject(val) {
-		if (val == null) {
-			throw new TypeError('Object.assign cannot be called with null or undefined');
-		}
+	var hasOwn      = __webpack_require__(3)
+	var getPrefixed = __webpack_require__(4)
 
-		return Object(val);
-	}
-
-	module.exports = Object.assign || function (target, source) {
-		var from;
-		var keys;
-		var to = ToObject(target);
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = arguments[s];
-			keys = Object.keys(Object(from));
-
-			for (var i = 0; i < keys.length; i++) {
-				to[keys[i]] = from[keys[i]];
-			}
-		}
-
-		return to;
-	};
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var hasOwn      = __webpack_require__(4)
-	var getPrefixed = __webpack_require__(5)
-
-	var map      = __webpack_require__(6)
-	var plugable = __webpack_require__(1)
+	var map      = __webpack_require__(10)
+	var plugable = __webpack_require__(11)
 
 	function plugins(key, value){
 
@@ -696,8 +665,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = plugable(RESULT)
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/* 3 */
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -707,12 +676,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var getStylePrefixed = __webpack_require__(8)
+	var getStylePrefixed = __webpack_require__(5)
 	var properties       = __webpack_require__(9)
 
 	module.exports = function(key, value){
@@ -725,41 +694,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	module.exports = function(fn, item){
-
-		if (!item){
-			return
-		}
-
-		if (Array.isArray(item)){
-			return item.map(fn).filter(function(x){
-				return !!x
-			})
-		} else {
-			return fn(item)
-		}
-	}
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_7__;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var toUpperFirst = __webpack_require__(11)
-	var getPrefix    = __webpack_require__(12)
-	var el           = __webpack_require__(13)
+	var toUpperFirst = __webpack_require__(6)
+	var getPrefix    = __webpack_require__(7)
+	var el           = __webpack_require__(8)
 
 	var MEMORY = {}
 	var STYLE
@@ -808,8 +750,81 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 9 */
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function(str){
+		return str?
+				str.charAt(0).toUpperCase() + str.slice(1):
+				''
+	}
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(6)
+	var prefixes     = ["ms", "Moz", "Webkit", "O"]
+
+	var el = __webpack_require__(8)
+
+	var ELEMENT
+	var PREFIX
+
+	module.exports = function(key){
+
+		if (PREFIX !== undefined){
+			return PREFIX
+		}
+
+		ELEMENT = ELEMENT || el()
+
+		var i = 0
+		var len = prefixes.length
+		var tmp
+		var prefix
+
+		for (; i < len; i++){
+			prefix = prefixes[i]
+			tmp = prefix + toUpperFirst(key)
+
+			if (typeof ELEMENT.style[tmp] != 'undefined'){
+				return PREFIX = prefix
+			}
+		}
+
+		return PREFIX
+	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var el
+
+	module.exports = function(){
+
+		if(!el && !!global.document){
+		  	el = global.document.createElement('div')
+		}
+
+		if (!el){
+			el = {style: {}}
+		}
+
+		return el
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -857,13 +872,70 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function(fn, item){
+
+		if (!item){
+			return
+		}
+
+		if (Array.isArray(item)){
+			return item.map(fn).filter(function(x){
+				return !!x
+			})
+		} else {
+			return fn(item)
+		}
+	}
+
+/***/ },
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var getPrefix     = __webpack_require__(12)
-	var forcePrefixed = __webpack_require__(14)
-	var el            = __webpack_require__(13)
+	var getCssPrefixedValue = __webpack_require__(12)
+
+	module.exports = function(target){
+		target.plugins = target.plugins || [
+			(function(){
+				var values = {
+					'flex':1,
+					'inline-flex':1
+				}
+
+				return function(key, value){
+					if (key === 'display' && value in values){
+						return {
+							key  : key,
+							value: getCssPrefixedValue(key, value, true)
+						}
+					}
+				}
+			})()
+		]
+
+		target.plugin = function(fn){
+			target.plugins = target.plugins || []
+
+			target.plugins.push(fn)
+		}
+
+		return target
+	}
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getPrefix     = __webpack_require__(7)
+	var forcePrefixed = __webpack_require__(13)
+	var el            = __webpack_require__(8)
 
 	var MEMORY = {}
 	var STYLE
@@ -910,86 +982,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = function(str){
-		return str?
-				str.charAt(0).toUpperCase() + str.slice(1):
-				''
-	}
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var toUpperFirst = __webpack_require__(11)
-	var prefixes     = ["ms", "Moz", "Webkit", "O"]
-
-	var el = __webpack_require__(13)
-
-	var ELEMENT
-	var PREFIX
-
-	module.exports = function(key){
-
-		if (PREFIX !== undefined){
-			return PREFIX
-		}
-
-		ELEMENT = ELEMENT || el()
-
-		var i = 0
-		var len = prefixes.length
-		var tmp
-		var prefix
-
-		for (; i < len; i++){
-			prefix = prefixes[i]
-			tmp = prefix + toUpperFirst(key)
-
-			if (typeof ELEMENT.style[tmp] != 'undefined'){
-				return PREFIX = prefix
-			}
-		}
-
-		return PREFIX
-	}
-
-/***/ },
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-
-	var el
-
-	module.exports = function(){
-
-		if(!el && !!global.document){
-		  	el = global.document.createElement('div')
-		}
-
-		if (!el){
-			el = {style: {}}
-		}
-
-		return el
-	}
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
-	var toUpperFirst = __webpack_require__(11)
-	var getPrefix    = __webpack_require__(12)
+	var toUpperFirst = __webpack_require__(6)
+	var getPrefix    = __webpack_require__(7)
 	var properties   = __webpack_require__(9)
 
 	/**
@@ -1010,6 +1009,38 @@ return /******/ (function(modules) { // webpackBootstrap
 					prefix + toUpperFirst(key):
 					key
 	}
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function ToObject(val) {
+		if (val == null) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	module.exports = Object.assign || function (target, source) {
+		var from;
+		var keys;
+		var to = ToObject(target);
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = arguments[s];
+			keys = Object.keys(Object(from));
+
+			for (var i = 0; i < keys.length; i++) {
+				to[keys[i]] = from[keys[i]];
+			}
+		}
+
+		return to;
+	};
+
 
 /***/ }
 /******/ ])
