@@ -25,8 +25,37 @@ const DESCRIPTOR = {
             PT.bool
         ]),
         isEmpty  : PT.func,
-        clearTool: PT.node,
-        value    : PT.string
+        clearTool: PT.oneOfType([
+            PT.node,
+            PT.bool
+        ]),
+        value    : PT.string,
+
+        defaultClearToolStyle   : PT.object,
+        clearToolColor          : PT.string,
+        clearToolOverColor      : PT.string,
+        defaultStyle            : PT.object,
+        defaultFocusedStyle     : PT.object,
+        defaultInnerStyle       : PT.object,
+        defaultInvalidStyle     : PT.object,
+        defaultInputStyle       : PT.object,
+        defaultInputInvalidStyle: PT.object,
+        focusedStyle            : PT.object,
+        defaultClassName        : PT.string,
+        emptyClassName          : PT.string,
+        invalidClassName        : PT.string,
+        inputClassName          : PT.string,
+        focusOnClick            : PT.bool,
+        stopChangePropagation   : PT.bool,
+        stopSelectPropagation   : PT.bool,
+        emptyValue              : PT.string,
+        inputProps              : PT.object,
+        toolsPosition           : PT.string,
+        focused                 : PT.bool,
+        valid                   : PT.bool,
+        empty                   : PT.bool,
+        innerStyle              : PT.object,
+        onClearToolClick        : PT.func
     },
 
     getInitialState: function(){
@@ -126,7 +155,12 @@ const DESCRIPTOR = {
 
         var children = this.renderChildren(props, this.state)
 
-        var divProps = assign({}, props)
+        var divProps = {}
+        Object.keys(props).forEach(function(propName) {
+            if (!DESCRIPTOR.propTypes[propName]){
+                divProps[propName] = props[propName]
+            }
+        })
         delete divProps.value
         delete divProps.placeholder
 
